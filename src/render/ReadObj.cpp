@@ -2,6 +2,7 @@
 #include <fstream>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+#include "../src/DxEngine.h"
 
 HRESULT ReadObjFromFile(const char* fileName, MyMesh **out) {
 	std::ifstream objFile(fileName);
@@ -62,16 +63,16 @@ HRESULT ReadObjFromFile(const char* fileName, MyMesh **out) {
 						vert.pos.y = vertList[ind1].pos.y;
 						vert.pos.z = vertList[ind1].pos.z;
 						vert.color = vertList[ind1].color;
-						vert.TexCoord.y = -texDataList[ind2].y;
-						vert.TexCoord.x = texDataList[ind2].x;
+						vert.texCoord.y = -texDataList[ind2].y;
+						vert.texCoord.x = texDataList[ind2].x;
 					}
 					if (subSplits.size() == 3) {
 						WORD ind1, ind2, ind3;
 						ind1 = boost::lexical_cast<WORD>(subSplits[0]) - 1;
 						if (subSplits[1] != "") {
 							ind2 = boost::lexical_cast<WORD>(subSplits[1]) - 1;
-							vert.TexCoord.y = -texDataList[ind2].y;
-							vert.TexCoord.x = texDataList[ind2].x;
+							vert.texCoord.y = -texDataList[ind2].y;
+							vert.texCoord.x = texDataList[ind2].x;
 						}
 						if (subSplits[2] != "") {
 							ind3 = boost::lexical_cast<WORD>(subSplits[2]) - 1;

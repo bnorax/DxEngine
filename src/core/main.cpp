@@ -1,27 +1,21 @@
-﻿#define no_init_all deprecated
+#define no_init_all deprecated
 
 #include <DirectXmath.h>
 #include <DirectXColors.h>
 #include <d3d11.h>
-#include <tchar.h>
-#include "Init.h"
 #include <vector>
 #include <math.h>
 #include <algorithm>
-#include <numeric>
-#include <functional>
-#include <windowsx.h>
 #include <WICTextureLoader.h>
 #include <chrono>
 #include <time.h>
 #include <SpriteBatch.h>
 #include <SpriteFont.h>
+#include "../src/DxEngine.h"
 
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 //win32
-static TCHAR szWindowClass[] = _T("DesktopApp");
-static TCHAR szTitle[] = _T("Windows Desktop Application");
 
 std::unique_ptr<DirectX::SpriteBatch> spriteBatch;
 std::unique_ptr<DirectX::SpriteFont> spriteFont;
@@ -31,6 +25,8 @@ DirectX::XMFLOAT3 g_directionLight = { -1.0f, 0 , 0.8f };
 
 ID3D11BlendState* g_blds;
 ID3D11ShaderResourceView* g_text_view = nullptr;
+HWND g_hWnd;
+
 
 void Camera(POINT mPrev) {
 	POINT mCur;
@@ -39,15 +35,16 @@ void Camera(POINT mPrev) {
 		GetCursorPos(&mCur);
 		ScreenToClient(g_hWnd, &mCur);
 		if (&mPrev || &mCur != NULL) {
-			if (mCur.y - mPrev.y >1) {
+			if (mCur.y - mPrev.y > 1) {
 				g_View *= DirectX::XMMatrixRotationX(-0.01f);
 			}
-			else if(mCur.y - mPrev.y < -1){
+			else if (mCur.y - mPrev.y < -1) {
 				g_View *= DirectX::XMMatrixRotationX(0.01f);
 			}
-			if (mCur.x - mPrev.x >1) {
+			if (mCur.x - mPrev.x > 1) {
 				g_View *= DirectX::XMMatrixRotationY(-0.02f);
-			}else if(mCur.x - mPrev.x < -1){
+			}
+			else if (mCur.x - mPrev.x < -1) {
 				g_View *= DirectX::XMMatrixRotationY(0.02f);
 			}
 		}
@@ -67,7 +64,7 @@ void Camera(POINT mPrev) {
 	if (GetAsyncKeyState(0x41) < 0) {
 		g_View *= DirectX::XMMatrixTranslation(0.01f*a, 0, 0);
 	}
-	if (GetAsyncKeyState(0x27)<0) {
+	if (GetAsyncKeyState(0x27) < 0) {
 		g_directionLight.x -= 0.05f;
 	}
 	if (GetAsyncKeyState(0x25) < 0) {
@@ -85,12 +82,12 @@ void WaveFunc(MyMesh *mesh) {
 	float X, Y, Z;
 	float A = 0.2f, D[2] = { 0.6f, 0.6f }, L = 1.0f, S = 0.005f;
 	int t;
-	float phi = S * (2/ L);
+	float phi = S * (2 / L);
 	float w = 2 / L;
-	float Q = 0.05;
+	float Q = 0.05f;
 	for (int i = 0; i < mesh->verts.size(); i++) {
 		float skl = D[0] * mesh->verts[i].pos.x + D[1] * mesh->verts[i].pos.y;
-		t = GetTickCount64();
+		t = (int)GetTickCount64();
 		Z = A * sin(skl*w + t * phi);
 		//X = Q*A * D[0] * cos(w*skl + phi * t);
 		//Y = Q*A * D[1] * cos(w*skl + phi * t);
@@ -151,11 +148,11 @@ void Render(ImGuiIO& io, POINT& mPrev, std::vector<MyMesh> &allObjects) {
 	g_pd3dDeviceContext->Unmap(g_pVertexBuffer, 0);
 	g_pd3dDeviceContext->IASetVertexBuffers(0, 1, &g_pVertexBuffer, &stride, &offset);
 */
-	//DirectX::XMMATRIX rotate;
-	//rotate = DirectX::XMMatrixRotationY(t);
-	//DirectX::XMMATRIX translate;
-	//translate = DirectX::XMMatrixTranslation(sin(t)*2.0f, 2.0f*cos(t), cos(t)*sin(t));
-	//g_World = DirectX::XMMatrixRotationY(t*0.5f)  * translate;
+//DirectX::XMMATRIX rotate;
+//rotate = DirectX::XMMatrixRotationY(t);
+//DirectX::XMMATRIX translate;
+//translate = DirectX::XMMatrixTranslation(sin(t)*2.0f, 2.0f*cos(t), cos(t)*sin(t));
+//g_World = DirectX::XMMatrixRotationY(t*0.5f)  * translate;
 	float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	g_pd3dDeviceContext->OMSetBlendState(g_blendState, blendFactor, 0xffffffff);
 	g_pd3dDeviceContext->VSSetShader(vertex_shader_ptr, nullptr, 0);
@@ -176,14 +173,14 @@ void Render(ImGuiIO& io, POINT& mPrev, std::vector<MyMesh> &allObjects) {
 		ConstantBuffer cb;
 		cb.colorLight = g_colorLight;
 		cb.directionLight = g_directionLight;
-		cb.time.x = GetTickCount64();
+		cb.time.x = (float)GetTickCount64();
 		if (allObjects[i].staticMesh) {
 			//cb.mWorld = XMMatrixTranspose(g_World);
-			cb.mProjection = XMMatrixTranspose(DirectX::XMMatrixOrthographicLH(16*4, 9*4, 1, 0));
+			cb.mProjection = XMMatrixTranspose(DirectX::XMMatrixOrthographicLH(16 * 4, 9 * 4, 1, 0));
 			cb.mView = XMMatrixTranspose(DirectX::XMMatrixIdentity());
 			cb.mWorld = XMMatrixTranspose(DirectX::XMMatrixIdentity());
 			g_pd3dDeviceContext->OMSetDepthStencilState(g_depthStencilStateOff, 0);
-			float blendFactor[4] = {0.0f, 0.0f, 0.0f, 0.0f };
+			float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 			g_pd3dDeviceContext->OMSetBlendState(g_blendStateAlpha, blendFactor, 0xffffffff);
 
 		}
@@ -194,16 +191,16 @@ void Render(ImGuiIO& io, POINT& mPrev, std::vector<MyMesh> &allObjects) {
 			g_pd3dDeviceContext->OMSetDepthStencilState(g_depthStencilState, 0);
 		}
 		g_pd3dDeviceContext->UpdateSubresource(g_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-		if (allObjects[i].Texture != nullptr) {
+		if (allObjects[i].texture != nullptr) {
 			//g_pd3dDeviceContext->PSSetShader(pixel_wave_ptr, nullptr, 0);
 			g_pd3dDeviceContext->PSSetShader(pixel_shader_ptr, nullptr, 0);
 			g_pd3dDeviceContext->PSSetSamplers(1, 1, &g_SamplerState);
-			g_pd3dDeviceContext->PSSetShaderResources(1, 1, &allObjects[i].Texture);
+			g_pd3dDeviceContext->PSSetShaderResources(1, 1, allObjects[i].texture.get());
 		}
 		else {
 			g_pd3dDeviceContext->PSSetShader(pixel_nt_shader_ptr, nullptr, 0);
 		}
-		g_pd3dDeviceContext->DrawIndexed(allObjects[i].ind.size(), 0, 0);
+		g_pd3dDeviceContext->DrawIndexed((UINT)allObjects[i].ind.size(), 0, 0);
 	}
 	spriteBatch->Begin();
 	spriteFont->DrawString(spriteBatch.get(), L"PGIZ laba", DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0, DirectX::XMFLOAT2(0, 0), 2);
@@ -215,10 +212,12 @@ void Render(ImGuiIO& io, POINT& mPrev, std::vector<MyMesh> &allObjects) {
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	POINT mPrev;
-	InitWindow(hInstance);
-	ShowWindow(g_hWnd, SW_SHOWDEFAULT);
-	UpdateWindow(g_hWnd);
-	InitDevice(g_hWnd);
+	DxEngine::OSWindow mainWindow(1920, 1080,_T("MainWindow"));
+	g_hWnd = mainWindow.hWnd;
+	mainWindow.InitWindow();
+	ShowWindow(mainWindow.hWnd, SW_SHOWDEFAULT);
+	UpdateWindow(mainWindow.hWnd);
+	InitDevice(mainWindow.hWnd);
 
 	std::vector<MyMesh> allObjects;
 	MyMesh *temp = nullptr;
@@ -236,7 +235,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	if (hr == S_OK) {
 		allObjects.push_back(*temp);
 		DirectX::CreateWICTextureFromFile(g_pd3dDevice, L"c1.png", nullptr, &allObjects.back().Texture);
-		
+
 	}*/
 	/*skybox = new MyMesh;
 	hr = ReadObjFromFile("skybox.obj", &skybox);
@@ -244,14 +243,14 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		DirectX::CreateWICTextureFromFile(g_pd3dDevice, L"skybox.png", nullptr, &skybox->Texture);
 	}
 */
-	
-	//hr = ReadObjFromFile("scope.obj", &temp);
-	//if (hr == S_OK) {
-	//	/*for (int i = 0; i < temp->verts.size(); i++) {
-	//		temp->verts[i].color.x = (float)rand() / ((float)RAND_MAX + 1);
-	//		temp->verts[i].color.y = (float)rand() / ((float)RAND_MAX + 1);
-	//		temp->verts[i].color.z = (float)rand() / ((float)RAND_MAX + 1);
-	//	}*/\
+
+//hr = ReadObjFromFile("scope.obj", &temp);
+//if (hr == S_OK) {
+//	/*for (int i = 0; i < temp->verts.size(); i++) {
+//		temp->verts[i].color.x = (float)rand() / ((float)RAND_MAX + 1);
+//		temp->verts[i].color.y = (float)rand() / ((float)RAND_MAX + 1);
+//		temp->verts[i].color.z = (float)rand() / ((float)RAND_MAX + 1);
+//	}*/\
 	//	DirectX::CreateWICTextureFromFile(g_pd3dDevice, L"scope.png", nullptr, &temp->Texture);
 	//	temp->staticMesh = true;
 	//	allObjects.push_back(*temp);
@@ -272,7 +271,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	ImGui::StyleColorsDark();
-	ImGui_ImplWin32_Init(g_hWnd);
+	ImGui_ImplWin32_Init(mainWindow.hWnd);
 	ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
 	MSG msg = {};
 	ZeroMemory(&msg, sizeof(msg));
@@ -289,8 +288,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 	}
 
-	DestroyWindow(g_hWnd);
-	UnregisterClass(szWindowClass, hInstance);
+	DestroyWindow(mainWindow.hWnd);
+	UnregisterClass(mainWindow.szWindowClass, hInstance);
 	return 0;
 }
 

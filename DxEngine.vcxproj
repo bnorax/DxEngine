@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FrameStats.h" />
     <ClInclude Include="include\entt\entt.hpp" />
     <ClInclude Include="include\imgui\imconfig.h" />
     <ClInclude Include="include\imgui\imgui.h" />
@@ -29,29 +28,35 @@
     <ClInclude Include="include\imgui\imstb_rectpack.h" />
     <ClInclude Include="include\imgui\imstb_textedit.h" />
     <ClInclude Include="include\imgui\imstb_truetype.h" />
-    <ClInclude Include="src\core\Init.h" />
-    <ClInclude Include="src\core\InitBuff.h" />
-    <ClInclude Include="src\core\InitDevice.h" />
-    <ClInclude Include="src\core\InitShader.h" />
+    <ClInclude Include="src\controls\Camera.h" />
     <ClInclude Include="src\core\InitWindow.h" />
-    <ClInclude Include="src\core\ReadObj.h" />
-    <ClInclude Include="DeltaTime.h" />
+    <ClInclude Include="src\core\Main.h" />
+    <ClInclude Include="src\DxEngine.h" />
+    <ClInclude Include="src\render\DeltaTime.h" />
+    <ClInclude Include="src\render\FrameStats.h" />
+    <ClInclude Include="src\render\InitBuff.h" />
+    <ClInclude Include="src\render\InitDevice.h" />
+    <ClInclude Include="src\render\InitShader.h" />
+    <ClInclude Include="src\render\ObjectToRender.h" />
+    <ClInclude Include="src\render\ReadObj.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="FrameStats.cpp" />
     <ClCompile Include="include\imgui\imgui.cpp" />
     <ClCompile Include="include\imgui\imgui_demo.cpp" />
     <ClCompile Include="include\imgui\imgui_draw.cpp" />
     <ClCompile Include="include\imgui\imgui_impl_dx11.cpp" />
     <ClCompile Include="include\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="include\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="src\core\InitBuff.cpp" />
-    <ClCompile Include="src\core\InitDevice.cpp" />
-    <ClCompile Include="src\core\InitShader.cpp" />
+    <ClCompile Include="src\controls\Camera.cpp" />
     <ClCompile Include="src\core\InitWindow.cpp" />
-    <ClCompile Include="src\core\main.cpp" />
-    <ClCompile Include="src\core\ReadObj.cpp" />
-    <ClCompile Include="DeltaTime.cpp" />
+    <ClCompile Include="src\core\Main.cpp" />
+    <ClCompile Include="src\render\DeltaTime.cpp" />
+    <ClCompile Include="src\render\FrameStats.cpp" />
+    <ClCompile Include="src\render\InitBuff.cpp" />
+    <ClCompile Include="src\render\InitDevice.cpp" />
+    <ClCompile Include="src\render\InitShader.cpp" />
+    <ClCompile Include="src\render\ObjectToRender.cpp" />
+    <ClCompile Include="src\render\ReadObj.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="include\imgui\imgui.ini" />
@@ -168,7 +173,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Boost\boost_1_74_0;C:\DxEngine\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\boost\boost_1_74_0;C:\Users\ASUS\Desktop\Engine\DxEngine\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -206,7 +211,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Boost\boost_1_74_0;C:\DxEngine\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\boost\boost_1_74_0;C:\Users\ASUS\Desktop\Engine\DxEngine\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
