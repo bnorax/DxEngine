@@ -2,6 +2,7 @@
 #include <DirectXmath.h>
 #include "InitDevice.h"
 #include "InitBuff.h"
+#include "../src/DxEngine.h"
 
 
 //ID3D11Buffer* g_pVertexBuffer = NULL;
@@ -56,7 +57,7 @@ void InitIndexBuffer(std::vector<MyMesh>& allObjects) {
 		ID3D11Buffer* newBuf;
 		D3D11_BUFFER_DESC bd = {};
 		bd.Usage = D3D11_USAGE_DEFAULT;
-		bd.ByteWidth = sizeof(WORD) * allObjects.at(i).ind.size();        // 36 vertices needed for 12 triangles in a triangle list
+		bd.ByteWidth = (UINT)sizeof(WORD) * allObjects.at(i).ind.size();        // 36 vertices needed for 12 triangles in a triangle list
 		bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
 		bd.CPUAccessFlags = 0;
 		D3D11_SUBRESOURCE_DATA InitData;

@@ -2,6 +2,9 @@
 #include <vector>
 #include <d3d11.h>
 #include <directXmath.h>
+#include "../src/DxEngine.h"
+
+class MyMesh;
 
 extern DirectX::XMMATRIX g_World;
 extern DirectX::XMMATRIX g_View;
@@ -22,12 +25,6 @@ extern std::vector<ID3D11Buffer*> g_VBA;
 
 extern std::vector<ID3D11Buffer*> g_IBA;
 
-struct TexCoord {
-	float x;
-	float y;
-};
-
-
 struct ConstantBuffer {
 	DirectX::XMMATRIX mWorld;
 	DirectX::XMMATRIX mView;
@@ -37,18 +34,6 @@ struct ConstantBuffer {
 	DirectX::XMFLOAT2 time;
 };
 
-struct SimpleVertex {
-	DirectX::XMFLOAT3 pos;
-	DirectX::XMFLOAT4 color;
-	DirectX::XMFLOAT2 TexCoord;
-	DirectX::XMFLOAT3 normal;
-};
-struct MyMesh {
-	std::vector<SimpleVertex> verts;
-	std::vector<WORD> ind;
-	ID3D11ShaderResourceView* Texture = nullptr;
-	bool staticMesh = false;
-};
 void InitSamplerState();
 void InitDepthBuf();
 void InitVertexBuffer(std::vector<MyMesh>& allObjects);
