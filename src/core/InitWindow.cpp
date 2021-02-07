@@ -1,5 +1,4 @@
-#include <windows.h>
-#include <tchar.h>
+#include <dxpch.h>
 #include "InitWindow.h"
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);

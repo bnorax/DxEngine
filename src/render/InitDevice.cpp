@@ -1,4 +1,5 @@
-#include <d3d11.h>
+#include <dxpch.h>
+#include "InitDevice.h"
 //#include "RenderTriangle.h"
 
 

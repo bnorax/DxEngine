@@ -1,17 +1,17 @@
 #define no_init_all deprecated
 
+#include "dxpch.h"
+//d3d11
 #include <DirectXmath.h>
 #include <DirectXColors.h>
-#include <d3d11.h>
-#include <vector>
-#include <math.h>
-#include <algorithm>
+
+
+#include <DxEngine.h>
+
+//directxtk
 #include <WICTextureLoader.h>
-#include <chrono>
-#include <time.h>
 #include <SpriteBatch.h>
 #include <SpriteFont.h>
-#include "../src/DxEngine.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 //win32
@@ -27,59 +27,9 @@ ID3D11ShaderResourceView* g_text_view = nullptr;
 HWND g_hWnd;
 
 
-void Camera(POINT mPrev) {
-	POINT mCur;
-	float a = 1;
-	if (GetAsyncKeyState(VK_RBUTTON) < 0) {
-		GetCursorPos(&mCur);
-		ScreenToClient(g_hWnd, &mCur);
-		if (&mPrev || &mCur != NULL) {
-			if (mCur.y - mPrev.y > 1) {
-				g_View *= DirectX::XMMatrixRotationX(-0.01f);
-			}
-			else if (mCur.y - mPrev.y < -1) {
-				g_View *= DirectX::XMMatrixRotationX(0.01f);
-			}
-			if (mCur.x - mPrev.x > 1) {
-				g_View *= DirectX::XMMatrixRotationY(-0.02f);
-			}
-			else if (mCur.x - mPrev.x < -1) {
-				g_View *= DirectX::XMMatrixRotationY(0.02f);
-			}
-		}
-	}
-	if (GetAsyncKeyState(VK_SHIFT) < 0) {
-		a = 10;
-	}
-	if (GetAsyncKeyState(0x57) < 0) {
-		g_View *= DirectX::XMMatrixTranslation(0, 0, -0.01f*a);
-	}
-	if (GetAsyncKeyState(0x53) < 0) {
-		g_View *= DirectX::XMMatrixTranslation(0, 0, 0.01f*a);
-	}
-	if (GetAsyncKeyState(0x44) < 0) {
-		g_View *= DirectX::XMMatrixTranslation(-0.01f*a, 0, 0);
-	}
-	if (GetAsyncKeyState(0x41) < 0) {
-		g_View *= DirectX::XMMatrixTranslation(0.01f*a, 0, 0);
-	}
-	if (GetAsyncKeyState(0x27) < 0) {
-		g_directionLight.x -= 0.05f;
-	}
-	if (GetAsyncKeyState(0x25) < 0) {
-		g_directionLight.x += 0.05f;
-	}
-	if (GetAsyncKeyState(0x26) < 0) {
-		g_directionLight.y -= 0.05f;
-	}
-	if (GetAsyncKeyState(0x28) < 0) {
-		g_directionLight.y += 0.05f;
-	}
-}
-
 void WaveFunc(MyMesh *mesh) {
 	float X, Y, Z;
-	float A = 0.2f, D[2] = { 0.6f, 0.6f }, L = 1.0f, S = 0.005f;
+	float A = 0.1f, D[2] = { 0.1f, 0.2f }, L = 0.5f, S = 0.01f;
 	int t;
 	float phi = S * (2 / L);
 	float w = 2 / L;
@@ -96,21 +46,9 @@ void WaveFunc(MyMesh *mesh) {
 
 	}
 }
-//void meshGen(MyMesh *out) {
-//	int count = 0;
-//	int numSlices = 10;
-//	float M_PI = 3.14;
-//	int numSegments = 10;
-//	int sphereRadius = 2;
-//	int size = 2;
-//	int posx = 0, posy = 0;
-//	int x = abs(posx- size);
-//	int y = abs(posy - size);
-//}
 
 
-
-void Render(ImGuiIO& io, POINT& mPrev, std::vector<MyMesh> &allObjects) {
+void Render(ImGuiIO &io, DxEngine::EditorCamera &camera, std::vector<MyMesh> &allObjects) {
 	//imgui
 
 	g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, DirectX::Colors::MidnightBlue);
@@ -124,9 +62,7 @@ void Render(ImGuiIO& io, POINT& mPrev, std::vector<MyMesh> &allObjects) {
 	t = (timeCur - timeStart) / 1000.0f;
 	static ImVec4 color = ImVec4(114.0f / 255.0f, 144.0f / 255.0f, 154.0f / 255.0f, 200.0f / 255.0f);
 	if (!io.WantCaptureMouse) {
-		Camera(mPrev);
-		GetCursorPos(&mPrev);
-		ScreenToClient(g_hWnd, &mPrev);
+		camera.EditorCameraUpdate();
 	}
 	//ImGui_ImplDX11_NewFrame();
 	//ImGui_ImplWin32_NewFrame();
@@ -202,7 +138,7 @@ void Render(ImGuiIO& io, POINT& mPrev, std::vector<MyMesh> &allObjects) {
 		g_pd3dDeviceContext->DrawIndexed((UINT)allObjects[i].ind.size(), 0, 0);
 	}
 	spriteBatch->Begin();
-	spriteFont->DrawString(spriteBatch.get(), L"PGIZ laba", DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0, DirectX::XMFLOAT2(0, 0), 2);
+	spriteFont->DrawString(spriteBatch.get(), L"PGIZ laba", DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0, DirectX::XMFLOAT2(0, 0), 1);
 	spriteBatch->End();
 	g_pSwapChain->Present(1, 0);
 }
@@ -210,13 +146,15 @@ void Render(ImGuiIO& io, POINT& mPrev, std::vector<MyMesh> &allObjects) {
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	POINT mPrev;
 	DxEngine::OSWindow mainWindow(1920, 1080,_T("MainWindow"));
 	g_hWnd = mainWindow.hWnd;
 	mainWindow.InitWindow();
 	ShowWindow(mainWindow.hWnd, SW_SHOWDEFAULT);
 	UpdateWindow(mainWindow.hWnd);
 	InitDevice(mainWindow.hWnd);
+
+	//Camera
+	DxEngine::EditorCamera camera(&mainWindow.hWnd);
 
 	std::vector<MyMesh> allObjects;
 	MyMesh *temp = nullptr;
@@ -283,7 +221,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			continue;
 		}
 		else {
-			Render(io, mPrev, allObjects);
+			Render(io, camera, allObjects);
 		}
 	}
 

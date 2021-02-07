@@ -1,8 +1,8 @@
-#include "InitBuff.h"
-#include <fstream>
+#include <dxpch.h>
+#include "ReadObj.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
-#include "../src/DxEngine.h"
+#include "InitBuff.h"
 
 HRESULT ReadObjFromFile(const char* fileName, MyMesh **out) {
 	std::ifstream objFile(fileName);

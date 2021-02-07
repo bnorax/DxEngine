@@ -1,9 +1,5 @@
 #pragma once
-#include <vector>
-#include <d3d11.h>
 #include <directXmath.h>
-#include <memory>	
-
 
 struct SimpleVertex {
 	DirectX::XMFLOAT3 pos;

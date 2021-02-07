@@ -1,8 +1,7 @@
 #pragma once
-#include <vector>
-#include <d3d11.h>
+
 #include <directXmath.h>
-#include "../src/DxEngine.h"
+#include <DxEngine.h>
 
 class MyMesh;
 

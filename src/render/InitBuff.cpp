@@ -1,8 +1,6 @@
-#include <d3d11.h>
-#include <DirectXmath.h>
-#include "InitDevice.h"
+#include <dxpch.h>
 #include "InitBuff.h"
-#include "../src/DxEngine.h"
+#include "InitDevice.h"
 
 
 //ID3D11Buffer* g_pVertexBuffer = NULL;

@@ -1,6 +1,5 @@
 #pragma once
-#include <windows.h>
-#include <tchar.h>
+
 namespace DxEngine {
 	class OSWindow {
 	private:

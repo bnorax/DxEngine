@@ -1,7 +1,6 @@
-#include <d3d11.h>
+#include <dxpch.h>
 #include <d3dcompiler.h>
 #include "InitDevice.h"
-#include <string>
 
 ID3D11VertexShader* vertex_shader_ptr = NULL;
 ID3D11VertexShader* vertex_wave_ptr = NULL;

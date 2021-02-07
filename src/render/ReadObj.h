@@ -1,3 +1,3 @@
 #pragma once
-#include "../src/DxEngine.h"
+#include <DxEngine.h>
 extern HRESULT ReadObjFromFile(const char* fileName, MyMesh **out);
