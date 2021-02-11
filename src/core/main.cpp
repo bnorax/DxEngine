@@ -1,11 +1,12 @@
 #define no_init_all deprecated
 
 #include "dxpch.h"
+
 //d3d11
 #include <DirectXmath.h>
 #include <DirectXColors.h>
 
-
+//dxengine
 #include <DxEngine.h>
 
 //directxtk
@@ -14,7 +15,6 @@
 #include <SpriteFont.h>
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-//win32
 
 std::unique_ptr<DirectX::SpriteBatch> spriteBatch;
 std::unique_ptr<DirectX::SpriteFont> spriteFont;
@@ -52,7 +52,6 @@ void Render(ImGuiIO &io, DxEngine::EditorCamera &camera, std::vector<MyMesh> &al
 	//imgui
 
 	g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, DirectX::Colors::MidnightBlue);
-
 	g_pd3dDeviceContext->ClearDepthStencilView(g_depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	static float t = 0.0f;
 	static ULONGLONG timeStart = 0;
@@ -61,6 +60,8 @@ void Render(ImGuiIO &io, DxEngine::EditorCamera &camera, std::vector<MyMesh> &al
 		timeStart = timeCur;
 	t = (timeCur - timeStart) / 1000.0f;
 	static ImVec4 color = ImVec4(114.0f / 255.0f, 144.0f / 255.0f, 154.0f / 255.0f, 200.0f / 255.0f);
+
+	//imgui mouse capture switch
 	if (!io.WantCaptureMouse) {
 		camera.EditorCameraUpdate();
 	}
@@ -192,8 +193,12 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	//	temp->staticMesh = true;
 	//	allObjects.push_back(*temp);
 	//}
-	hr = ReadObjFromFile("resources/mesh/wave.obj", &temp);
+
+	hr = RedObjFromFileAssimp("resources/mesh/wave.obj", &temp);
+
+	//hr = ReadObjFromFile("resources/mesh/wave.obj", &temp);
 	allObjects.push_back(*temp);
+
 	InitVertexBuffer(allObjects);
 	InitIndexBuffer(allObjects);
 	InitDepthBuf();

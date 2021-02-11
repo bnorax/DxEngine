@@ -18,7 +18,8 @@
 #include <time.h>
 #include <fstream>
 #include <memory>	
-
+#undef min
+#undef max
 
 ////boost
 //#include <boost/algorithm/string.hpp>

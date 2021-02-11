@@ -349,3 +349,8 @@ MigrationBackup/
 .ionide/
 /DxEngine.vcxproj
 /DxEngine.vcxproj.filters
+/assimp-vc141-mtd.dll
+/lib/assimp/assimp-vc141-mtd.dll
+/lib/assimp/assimp-vc141-mtd.exp
+/lib/assimp/assimp-vc141-mtd.lib
+/tools/assimp/

@@ -4,6 +4,43 @@
 #include <boost/lexical_cast.hpp>
 #include "InitBuff.h"
 
+
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
+
+HRESULT RedObjFromFileAssimp(const char* fileName, MyMesh **out) {
+	Assimp::Importer importer;
+	const aiScene *scene = importer.ReadFile(fileName,
+		aiProcess_CalcTangentSpace |
+		aiProcess_Triangulate |
+		aiProcess_JoinIdenticalVertices |
+		aiProcess_SortByPType);
+	if (!scene) {
+		return E_FAIL;
+	}
+	aiMesh *mesh = scene->mMeshes[0];
+	MyMesh *mMesh = new MyMesh;
+	for (int i = 0; i< mesh->mNumVertices; i++) {
+		SimpleVertex sv;
+		sv.pos.x = mesh->mVertices[i].x;
+		sv.pos.y = mesh->mVertices[i].y;
+		sv.pos.z = mesh->mVertices[i].z;
+		sv.color = DirectX::XMFLOAT4(0.4f, 0.1f, 0.8f, 1.0f);
+		mMesh->verts.push_back(sv);
+	}
+	for (int i = 0; i<mesh->mNumFaces; i++) {
+		for (int j = 0; j< mesh->mFaces->mNumIndices; j++) {
+			mMesh->ind.push_back(mesh->mFaces[i].mIndices[j]);
+		}
+	}
+	*out = mMesh;
+	return S_OK;
+}
+
+
+
 HRESULT ReadObjFromFile(const char* fileName, MyMesh **out) {
 	std::ifstream objFile(fileName);
 	std::string temp, temp2;
@@ -105,6 +142,6 @@ HRESULT ReadObjFromFile(const char* fileName, MyMesh **out) {
 		*out = object;
 		return S_OK;
 	}
-	return E_ABORT;
+	return E_FAIL;
 
 }
