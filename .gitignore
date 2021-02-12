@@ -354,3 +354,5 @@ MigrationBackup/
 /lib/assimp/assimp-vc141-mtd.exp
 /lib/assimp/assimp-vc141-mtd.lib
 /tools/assimp/
+/resources/mesh/SchoolDesk_01_8-bit_Normal.png
+/resources/mesh/SchoolDesk_01_8-bit_OcclusionRoughnessMetallic.png

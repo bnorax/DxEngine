@@ -27,7 +27,6 @@ HRESULT RedObjFromFileAssimp(const char* fileName, MyMesh **out) {
 		sv.pos.x = mesh->mVertices[i].x;
 		sv.pos.y = mesh->mVertices[i].y;
 		sv.pos.z = mesh->mVertices[i].z;
-		sv.color = DirectX::XMFLOAT4(0.4f, 0.1f, 0.8f, 1.0f);
 		mMesh->verts.push_back(sv);
 	}
 	for (int i = 0; i<mesh->mNumFaces; i++) {
@@ -35,6 +34,8 @@ HRESULT RedObjFromFileAssimp(const char* fileName, MyMesh **out) {
 			mMesh->ind.push_back(mesh->mFaces[i].mIndices[j]);
 		}
 	}
+	
+	aiReturn tx = scene->mMaterials[0]->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), "SchoolDesk_01_8 - bit_Diffuse.png");
 	*out = mMesh;
 	return S_OK;
 }

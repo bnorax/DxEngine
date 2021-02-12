@@ -25,9 +25,9 @@ float4 ps_main(PS_INPUT input) : SV_Target
 	//float4 colorLight = { 1.0f, 1.0f, 1.0f, 1.0f };
 	//float3 directionLight = { 0.0f, 0 , -1.0f };
 	float4 textureColor = Tex.Sample(Samp, input.Texcoord);
-	float intensity = saturate(dot(input.Normal, -directionLight));
-	float4 light = saturate(colorLight*intensity);
-    float4 finalColor = light * textureColor;
+	//float intensity = saturate(dot(input.Normal, -directionLight));
+	//float4 light = saturate(colorLight*intensity);
+    float4 finalColor =/* light * */textureColor;
     finalColor.a = textureColor.a;
     return finalColor;
     //light * textureColor

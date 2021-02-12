@@ -27,25 +27,26 @@ ID3D11ShaderResourceView* g_text_view = nullptr;
 HWND g_hWnd;
 
 
-void WaveFunc(MyMesh *mesh) {
-	float X, Y, Z;
-	float A = 0.1f, D[2] = { 0.1f, 0.2f }, L = 0.5f, S = 0.01f;
-	int t;
-	float phi = S * (2 / L);
-	float w = 2 / L;
-	float Q = 0.05f;
-	for (int i = 0; i < mesh->verts.size(); i++) {
-		float skl = D[0] * mesh->verts[i].pos.x + D[1] * mesh->verts[i].pos.y;
-		t = (int)GetTickCount64();
-		Z = A * sin(skl*w + t * phi);
-		//X = Q*A * D[0] * cos(w*skl + phi * t);
-		//Y = Q*A * D[1] * cos(w*skl + phi * t);
-		//mesh->verts[i].pos.x = X;
-	//	mesh->verts[i].pos.y = Y;
-		mesh->verts[i].pos.z = Z;
 
-	}
-}
+//void WaveFunc(MyMesh *mesh) {
+//	float X, Y, Z;
+//	float A = 0.1f, D[2] = { 0.1f, 0.2f }, L = 0.5f, S = 0.01f;
+//	int t;
+//	float phi = S * (2 / L);
+//	float w = 2 / L;
+//	float Q = 0.05f;
+//	for (int i = 0; i < mesh->verts.size(); i++) {
+//		float skl = D[0] * mesh->verts[i].pos.x + D[1] * mesh->verts[i].pos.y;
+//		t = (int)GetTickCount64();
+//		Z = A * sin(skl*w + t * phi);
+//		//X = Q*A * D[0] * cos(w*skl + phi * t);
+//		//Y = Q*A * D[1] * cos(w*skl + phi * t);
+//		//mesh->verts[i].pos.x = X;
+//	//	mesh->verts[i].pos.y = Y;
+//		mesh->verts[i].pos.z = Z;
+//
+//	}
+//}
 
 
 void Render(ImGuiIO &io, DxEngine::EditorCamera &camera, std::vector<MyMesh> &allObjects) {
@@ -102,7 +103,7 @@ void Render(ImGuiIO &io, DxEngine::EditorCamera &camera, std::vector<MyMesh> &al
 	UINT offset = 0;
 
 	for (int i = 0; i < allObjects.size(); i++) {
-		WaveFunc(&allObjects[i]);
+	//	WaveFunc(&allObjects[i]);
 		UpdateVertexBuffer(g_VBA.at(i), allObjects[i]);
 		g_pd3dDeviceContext->IASetVertexBuffers(0, 1, &g_VBA.at(i), &stride, &offset);
 		g_pd3dDeviceContext->IASetIndexBuffer(g_IBA.at(i), DXGI_FORMAT_R16_UINT, 0);
@@ -121,7 +122,7 @@ void Render(ImGuiIO &io, DxEngine::EditorCamera &camera, std::vector<MyMesh> &al
 
 		}
 		else {
-			cb.mWorld = XMMatrixTranspose(g_World*DirectX::XMMatrixTranslation(0, 0, 12.0f*i));
+			cb.mWorld = XMMatrixTranspose(g_World*DirectX::XMMatrixTranslation(0, 0, 2.0f*i));
 			cb.mView = XMMatrixTranspose(g_View);
 			cb.mProjection = XMMatrixTranspose(g_Projection);
 			g_pd3dDeviceContext->OMSetDepthStencilState(g_depthStencilState, 0);
@@ -160,11 +161,13 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	std::vector<MyMesh> allObjects;
 	MyMesh *temp = nullptr;
 	HRESULT hr;
-	/*hr = ReadObjFromFile("deskn.obj", &temp);
-	if (hr == S_OK) {
+	//hr = ReadObjFromFile("resources/mesh/c1.obj", &temp);
+	/*if (hr == S_OK) {
+		DirectX::CreateWICTextureFromFile(g_pd3dDevice, L"desk.png", nullptr, temp->texture.get());
 		allObjects.push_back(*temp);
-		DirectX::CreateWICTextureFromFile(g_pd3dDevice, L"desk.png", nullptr, &allObjects.back().Texture);
 	}*/
+
+	hr = RedObjFromFileAssimp("resources/mesh/SchoolDesk.fbx", &temp);
 	//MyMesh gen;
 	//meshGen(&gen);
 	//allObjects.push_back(gen);
@@ -194,10 +197,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	//	allObjects.push_back(*temp);
 	//}
 
-	hr = RedObjFromFileAssimp("resources/mesh/wave.obj", &temp);
+	//hr = RedObjFromFileAssimp("resources/mesh/wave.obj", &temp);
 
 	//hr = ReadObjFromFile("resources/mesh/wave.obj", &temp);
-	allObjects.push_back(*temp);
+	//allObjects.push_back(*temp);
 
 	InitVertexBuffer(allObjects);
 	InitIndexBuffer(allObjects);
