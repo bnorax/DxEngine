@@ -1,6 +1,7 @@
 #define no_init_all deprecated
 
 #include "dxpch.h"
+#include "render/ModelLoader.h"
 
 //d3d11
 #include <DirectXmath.h>
@@ -49,7 +50,7 @@ HWND g_hWnd;
 //}
 
 
-void Render(ImGuiIO &io, DxEngine::EditorCamera &camera, std::vector<MyMesh> &allObjects) {
+void Render(ImGuiIO &io, DxEngine::EditorCamera &camera, std::vector<Mesh> &allObjects, ModelLoader &loader) {
 	//imgui
 
 	g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, DirectX::Colors::MidnightBlue);
@@ -91,57 +92,70 @@ void Render(ImGuiIO &io, DxEngine::EditorCamera &camera, std::vector<MyMesh> &al
 //translate = DirectX::XMMatrixTranslation(sin(t)*2.0f, 2.0f*cos(t), cos(t)*sin(t));
 //g_World = DirectX::XMMatrixRotationY(t*0.5f)  * translate;
 	float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	g_pd3dDeviceContext->OMSetBlendState(g_blendState, blendFactor, 0xffffffff);
+	//g_pd3dDeviceContext->OMSetBlendState(g_blendState, blendFactor, 0xffffffff);
 	g_pd3dDeviceContext->VSSetShader(vertex_shader_ptr, nullptr, 0);
 	// g_pd3dDeviceContext->VSSetShader(vertex_shader_ptr, nullptr, 0);
 	g_pd3dDeviceContext->VSSetConstantBuffers(1, 1, &g_pConstantBuffer);
 	g_pd3dDeviceContext->PSSetConstantBuffers(1, 1, &g_pConstantBuffer);
+
+	g_pd3dDeviceContext->PSSetShader(pixel_shader_ptr, nullptr, 0);
+	//g_pd3dDeviceContext->PSSetShader(pixel_nt_shader_ptr, nullptr, 0);
+	g_pd3dDeviceContext->PSSetSamplers(1, 1, &g_SamplerState);
 	g_pd3dDeviceContext->IASetInputLayout(input_layout_ptr);
 	g_pd3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	ConstantBuffer cb;
+	cb.mWorld = XMMatrixTranspose(g_World*DirectX::XMMatrixTranslation(0, 0, 2.0f));
+	cb.mView = XMMatrixTranspose(g_View);
+	cb.mProjection = XMMatrixTranspose(g_Projection);
+	g_pd3dDeviceContext->UpdateSubresource(g_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+	g_pd3dDeviceContext->OMSetDepthStencilState(g_depthStencilState, 0);
+	loader.Draw(g_pd3dDeviceContext);
+
+
 	//g_pd3dDeviceContext->RSSetState(g_rastState);
-	UINT stride = sizeof(SimpleVertex);
-	UINT offset = 0;
+	//UINT stride = sizeof(SimpleVertex);
+	//UINT offset = 0;
 
-	for (int i = 0; i < allObjects.size(); i++) {
-	//	WaveFunc(&allObjects[i]);
-		UpdateVertexBuffer(g_VBA.at(i), allObjects[i]);
-		g_pd3dDeviceContext->IASetVertexBuffers(0, 1, &g_VBA.at(i), &stride, &offset);
-		g_pd3dDeviceContext->IASetIndexBuffer(g_IBA.at(i), DXGI_FORMAT_R16_UINT, 0);
-		ConstantBuffer cb;
-		cb.colorLight = g_colorLight;
-		cb.directionLight = g_directionLight;
-		cb.time.x = (float)GetTickCount64();
-		if (allObjects[i].staticMesh) {
-			//cb.mWorld = XMMatrixTranspose(g_World);
-			cb.mProjection = XMMatrixTranspose(DirectX::XMMatrixOrthographicLH(16 * 4, 9 * 4, 1, 0));
-			cb.mView = XMMatrixTranspose(DirectX::XMMatrixIdentity());
-			cb.mWorld = XMMatrixTranspose(DirectX::XMMatrixIdentity());
-			g_pd3dDeviceContext->OMSetDepthStencilState(g_depthStencilStateOff, 0);
-			float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-			g_pd3dDeviceContext->OMSetBlendState(g_blendStateAlpha, blendFactor, 0xffffffff);
+	//for (int i = 0; i < allObjects.size(); i++) {
+	////	WaveFunc(&allObjects[i]);
+	//	UpdateVertexBuffer(g_VBA.at(i), allObjects[i]);
+	//	g_pd3dDeviceContext->IASetVertexBuffers(0, 1, &g_VBA.at(i), &stride, &offset);
+	//	g_pd3dDeviceContext->IASetIndexBuffer(g_IBA.at(i), DXGI_FORMAT_R16_UINT, 0);
+	//	ConstantBuffer cb;
+	//	cb.colorLight = g_colorLight;
+	//	cb.directionLight = g_directionLight;
+	//	cb.time.x = (float)GetTickCount64();
+	//	if (allObjects[i].staticMesh) {
+	//		//cb.mWorld = XMMatrixTranspose(g_World);
+	//		cb.mProjection = XMMatrixTranspose(DirectX::XMMatrixOrthographicLH(16 * 4, 9 * 4, 1, 0));
+	//		cb.mView = XMMatrixTranspose(DirectX::XMMatrixIdentity());
+	//		cb.mWorld = XMMatrixTranspose(DirectX::XMMatrixIdentity());
+	//		g_pd3dDeviceContext->OMSetDepthStencilState(g_depthStencilStateOff, 0);
+	//		float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	//		g_pd3dDeviceContext->OMSetBlendState(g_blendStateAlpha, blendFactor, 0xffffffff);
 
-		}
-		else {
-			cb.mWorld = XMMatrixTranspose(g_World*DirectX::XMMatrixTranslation(0, 0, 2.0f*i));
-			cb.mView = XMMatrixTranspose(g_View);
-			cb.mProjection = XMMatrixTranspose(g_Projection);
-			g_pd3dDeviceContext->OMSetDepthStencilState(g_depthStencilState, 0);
-		}
-		g_pd3dDeviceContext->UpdateSubresource(g_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-		if (allObjects[i].texture != nullptr) {
-			//g_pd3dDeviceContext->PSSetShader(pixel_wave_ptr, nullptr, 0);
-			g_pd3dDeviceContext->PSSetShader(pixel_shader_ptr, nullptr, 0);
-			g_pd3dDeviceContext->PSSetSamplers(1, 1, &g_SamplerState);
-			g_pd3dDeviceContext->PSSetShaderResources(1, 1, allObjects[i].texture.get());
-		}
-		else {
-			g_pd3dDeviceContext->PSSetShader(pixel_nt_shader_ptr, nullptr, 0);
-		}
-		g_pd3dDeviceContext->DrawIndexed((UINT)allObjects[i].ind.size(), 0, 0);
-	}
-	spriteBatch->Begin();
+	//	}
+	//	else {
+	//		cb.mWorld = XMMatrixTranspose(g_World*DirectX::XMMatrixTranslation(0, 0, 2.0f*i));
+	//		cb.mView = XMMatrixTranspose(g_View);
+	//		cb.mProjection = XMMatrixTranspose(g_Projection);
+	//		g_pd3dDeviceContext->OMSetDepthStencilState(g_depthStencilState, 0);
+	//	}
+	//	g_pd3dDeviceContext->UpdateSubresource(g_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+	//	if (allObjects[i].textures[0].texture != nullptr) {
+	//		//g_pd3dDeviceContext->PSSetShader(pixel_wave_ptr, nullptr, 0);
+	//		g_pd3dDeviceContext->PSSetShader(pixel_shader_ptr, nullptr, 0);
+	//		g_pd3dDeviceContext->PSSetSamplers(1, 1, &g_SamplerState);
+	//		g_pd3dDeviceContext->PSSetShaderResources(1, 1, allObjects[i].textures[0].texture.GetAddressOf());
+	//	}
+	//	else {
+	//		g_pd3dDeviceContext->PSSetShader(pixel_nt_shader_ptr, nullptr, 0);
+	//	}
+	//	g_pd3dDeviceContext->DrawIndexed((UINT)allObjects[i].indices.size(), 0, 0);
+	//}
+	/*spriteBatch->Begin();
 	spriteFont->DrawString(spriteBatch.get(), L"PGIZ laba", DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0, DirectX::XMFLOAT2(0, 0), 1);
-	spriteBatch->End();
+	spriteBatch->End();*/
 	g_pSwapChain->Present(1, 0);
 }
 
@@ -158,8 +172,11 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	//Camera
 	DxEngine::EditorCamera camera(&mainWindow.hWnd);
 
-	std::vector<MyMesh> allObjects;
-	MyMesh *temp = nullptr;
+	ModelLoader loader;
+	loader.Load(mainWindow.hWnd, g_pd3dDevice, g_pd3dDeviceContext, std::string("C:\\Engine\\DxEngine\\resources\\mesh\\cubeanim.glb"));
+	loader.Load(mainWindow.hWnd, g_pd3dDevice, g_pd3dDeviceContext, std::string("C:\\Engine\\DxEngine\\resources\\mesh\\b.glb"));
+	std::vector<Mesh> allObjects;
+	Mesh *temp = nullptr;
 	HRESULT hr;
 	//hr = ReadObjFromFile("resources/mesh/c1.obj", &temp);
 	/*if (hr == S_OK) {
@@ -167,7 +184,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		allObjects.push_back(*temp);
 	}*/
 
-	hr = RedObjFromFileAssimp("resources/mesh/SchoolDesk.fbx", &temp);
+//	hr = RedObjFromFileAssimp("resources/mesh/SchoolDesk.fbx", &temp);
 	//MyMesh gen;
 	//meshGen(&gen);
 	//allObjects.push_back(gen);
@@ -202,8 +219,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	//hr = ReadObjFromFile("resources/mesh/wave.obj", &temp);
 	//allObjects.push_back(*temp);
 
-	InitVertexBuffer(allObjects);
-	InitIndexBuffer(allObjects);
+	//InitVertexBuffer(allObjects);
+	//InitIndexBuffer(allObjects);
 	InitDepthBuf();
 	InitConstantBuffer(allObjects);
 	InitShader();
@@ -229,7 +246,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			continue;
 		}
 		else {
-			Render(io, camera, allObjects);
+			Render(io, camera, allObjects, loader);
 		}
 	}
 

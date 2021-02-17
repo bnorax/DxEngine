@@ -3,7 +3,7 @@
 #include <directXmath.h>
 #include <DxEngine.h>
 
-class MyMesh;
+class Mesh;
 
 extern DirectX::XMMATRIX g_World;
 extern DirectX::XMMATRIX g_View;
@@ -35,7 +35,7 @@ struct ConstantBuffer {
 
 void InitSamplerState();
 void InitDepthBuf();
-void InitVertexBuffer(std::vector<MyMesh>& allObjects);
-void InitIndexBuffer(std::vector<MyMesh>& allObjects);
-void InitConstantBuffer(std::vector<MyMesh>& allObjects);
-void UpdateVertexBuffer(ID3D11Buffer* vb, MyMesh newMesh);
+void InitVertexBuffer(std::vector<Mesh>& allObjects);
+void InitIndexBuffer(std::vector<Mesh>& allObjects);
+void InitConstantBuffer(std::vector<Mesh>& allObjects);
+void UpdateVertexBuffer(ID3D11Buffer* vb, Mesh newMesh);

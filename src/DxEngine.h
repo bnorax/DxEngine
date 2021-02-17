@@ -4,8 +4,8 @@
 #include "render/InitBuff.h"
 #include "render/InitDevice.h"
 #include "render/DeltaTime.h"
-#include "render/ObjectToRender.h"
-#include "render/ReadObj.h"
+#include "render/Mesh.h"
+#include "render/ModelLoader.h"
 #include "render/FrameStats.h"
 
 
