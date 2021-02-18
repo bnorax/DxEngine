@@ -87,20 +87,20 @@ void CleanupDeviceD3D()
 //	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 //	bd.CPUAccessFlags = 0;
 //	hr = g_pd3dDevice->CreateBuffer(&bd, nullptr, &g_pConstantBuffer);
-//	g_World = DirectX::XMMatrixIdentity();
-//	DirectX::XMVECTOR Eye = DirectX::XMVectorSet(0.0f, 1.0f, -5.0f, 0.0f);
-//	DirectX::XMVECTOR At = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-//	DirectX::XMVECTOR Up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-//	g_View = DirectX::XMMatrixLookAtLH(Eye, At, Up);
-//	g_Projection = DirectX::XMMatrixPerspectiveFovLH(DirectX::XM_PIDIV2, 1280 / (FLOAT)720, 0.01f, 100.0f);
+//	g_World = XMMatrixIdentity();
+//	XMVECTOR Eye = XMVectorSet(0.0f, 1.0f, -5.0f, 0.0f);
+//	XMVECTOR At = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+//	XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+//	g_View = XMMatrixLookAtLH(Eye, At, Up);
+//	g_Projection = XMMatrixPerspectiveFovLH(XM_PIDIV2, 1280 / (FLOAT)720, 0.01f, 100.0f);
 //}
 
 int InitDevice(HWND hWnd) {
 	DXGI_SWAP_CHAIN_DESC sd;
 	ZeroMemory(&sd, sizeof(sd));
 	sd.BufferCount = 2;
-	sd.BufferDesc.Width = 1280;
-	sd.BufferDesc.Height = 720;
+	sd.BufferDesc.Width = 1920;
+	sd.BufferDesc.Height = 1080;
 	sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	sd.BufferDesc.RefreshRate.Numerator = 60;
 	sd.BufferDesc.RefreshRate.Denominator = 1;
@@ -121,8 +121,8 @@ int InitDevice(HWND hWnd) {
 	CreateRenderTarget();
 	g_pd3dDeviceContext->OMSetRenderTargets(1, &g_mainRenderTargetView, NULL);
 	D3D11_VIEWPORT vp;
-	vp.Width = (FLOAT)1280;
-	vp.Height = (FLOAT)720;
+	vp.Width = (FLOAT)1920;
+	vp.Height = (FLOAT)1080;
 	vp.MinDepth = 0.0f;
 	vp.MaxDepth = 1.0f;
 	vp.TopLeftX = 0;

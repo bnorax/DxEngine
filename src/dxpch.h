@@ -12,6 +12,7 @@
 #include <tchar.h>
 #include <string>
 #include <vector>
+#include <map>
 #include <math.h>
 #include <algorithm>
 #include <chrono>

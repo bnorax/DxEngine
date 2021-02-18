@@ -11,16 +11,16 @@ void DxEngine::EditorCamera::EditorCameraUpdate()
 		ScreenToClient(*currentWindowHandler, &mCur);
 		if (&mPrev || &mCur != NULL) {
 			if (mCur.y - mPrev.y > 1) {
-				g_View *= DirectX::XMMatrixRotationX(-0.01f);
+				g_View *= XMMatrixRotationX(-0.01f);
 			}
 			else if (mCur.y - mPrev.y < -1) {
-				g_View *= DirectX::XMMatrixRotationX(0.01f);
+				g_View *= XMMatrixRotationX(0.01f);
 			}
 			if (mCur.x - mPrev.x > 1) {
-				g_View *= DirectX::XMMatrixRotationY(-0.02f);
+				g_View *= XMMatrixRotationY(-0.02f);
 			}
 			else if (mCur.x - mPrev.x < -1) {
-				g_View *= DirectX::XMMatrixRotationY(0.02f);
+				g_View *= XMMatrixRotationY(0.02f);
 			}
 		}
 	}
@@ -28,16 +28,16 @@ void DxEngine::EditorCamera::EditorCameraUpdate()
 		a = 10;
 	}
 	if (GetAsyncKeyState(0x57) < 0) {
-		g_View *= DirectX::XMMatrixTranslation(0, 0, -0.01f*a);
+		g_View *= XMMatrixTranslation(0, 0, -0.01f*a);
 	}
 	if (GetAsyncKeyState(0x53) < 0) {
-		g_View *= DirectX::XMMatrixTranslation(0, 0, 0.01f*a);
+		g_View *= XMMatrixTranslation(0, 0, 0.01f*a);
 	}
 	if (GetAsyncKeyState(0x44) < 0) {
-		g_View *= DirectX::XMMatrixTranslation(-0.01f*a, 0, 0);
+		g_View *= XMMatrixTranslation(-0.01f*a, 0, 0);
 	}
 	if (GetAsyncKeyState(0x41) < 0) {
-		g_View *= DirectX::XMMatrixTranslation(0.01f*a, 0, 0);
+		g_View *= XMMatrixTranslation(0.01f*a, 0, 0);
 	}
 	/*if (GetAsyncKeyState(0x27) < 0) {
 		g_directionLight.x -= 0.05f;

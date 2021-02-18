@@ -93,6 +93,7 @@ void Render(ImGuiIO &io, DxEngine::EditorCamera &camera, std::vector<Mesh> &allO
 //g_World = DirectX::XMMatrixRotationY(t*0.5f)  * translate;
 	float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	//g_pd3dDeviceContext->OMSetBlendState(g_blendState, blendFactor, 0xffffffff);
+
 	g_pd3dDeviceContext->VSSetShader(vertex_shader_ptr, nullptr, 0);
 	// g_pd3dDeviceContext->VSSetShader(vertex_shader_ptr, nullptr, 0);
 	g_pd3dDeviceContext->VSSetConstantBuffers(1, 1, &g_pConstantBuffer);
@@ -103,12 +104,6 @@ void Render(ImGuiIO &io, DxEngine::EditorCamera &camera, std::vector<Mesh> &allO
 	g_pd3dDeviceContext->PSSetSamplers(1, 1, &g_SamplerState);
 	g_pd3dDeviceContext->IASetInputLayout(input_layout_ptr);
 	g_pd3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	ConstantBuffer cb;
-	cb.mWorld = XMMatrixTranspose(g_World*DirectX::XMMatrixTranslation(0, 0, 2.0f));
-	cb.mView = XMMatrixTranspose(g_View);
-	cb.mProjection = XMMatrixTranspose(g_Projection);
-	g_pd3dDeviceContext->UpdateSubresource(g_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-	g_pd3dDeviceContext->OMSetDepthStencilState(g_depthStencilState, 0);
 	loader.Draw(g_pd3dDeviceContext);
 
 
@@ -173,8 +168,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	DxEngine::EditorCamera camera(&mainWindow.hWnd);
 
 	ModelLoader loader;
-	loader.Load(mainWindow.hWnd, g_pd3dDevice, g_pd3dDeviceContext, std::string("C:\\Engine\\DxEngine\\resources\\mesh\\cubeanim.glb"));
-	loader.Load(mainWindow.hWnd, g_pd3dDevice, g_pd3dDeviceContext, std::string("C:\\Engine\\DxEngine\\resources\\mesh\\b.glb"));
+	loader.Load(mainWindow.hWnd, g_pd3dDevice, g_pd3dDeviceContext, std::string("C:\\Engine\\DxEngine\\resources\\mesh\\miku.glb"));
+	//loader.Load(mainWindow.hWnd, g_pd3dDevice, g_pd3dDeviceContext, std::string("C:\\Engine\\DxEngine\\resources\\mesh\\b.glb"));
 	std::vector<Mesh> allObjects;
 	Mesh *temp = nullptr;
 	HRESULT hr;

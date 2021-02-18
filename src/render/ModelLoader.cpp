@@ -2,133 +2,29 @@
 #include "ModelLoader.h"
 #include "InitBuff.h"
 
-using namespace Microsoft::WRL;
-//
-//HRESULT ReadObjFromFile(const char* fileName, Mesh **out) {
-//	std::ifstream objFile(fileName);
-//	std::string temp, temp2;
-//	std::vector<std::string> splits, subSplits;
-//	std::vector<SimpleVertex> vertList;
-//	std::vector<DirectX::XMFLOAT2> texDataList;
-//	std::vector<DirectX::XMFLOAT3> normalDataList;
-//	std::vector<WORD> vertIndsList;
-//	std::vector<WORD> texIndsList;
-//	SimpleVertex vert;
-//	Mesh *object = new Mesh;
-//	int verticesI = 0;
-//	int indicesI = 0;
-//
-//
-//	if (objFile.is_open()) {
-//		while (getline(objFile, temp)) {
-//			boost::split(splits, temp, boost::is_any_of(" "));
-//			if (splits[0] == "v") {
-//				vert.pos.x = boost::lexical_cast<float>(splits[1]);
-//				vert.pos.y = boost::lexical_cast<float>(splits[2]);
-//				vert.pos.z = boost::lexical_cast<float>(splits[3]);
-//				vert.color = DirectX::XMFLOAT4 (0.4f, 0.1f, 0.8f, 1.0f);
-//				vertList.push_back(vert);
-//				continue;
-//			}
-//			if (splits[0] == "vt") {
-//				DirectX::XMFLOAT2 newD;
-//				newD.x = boost::lexical_cast<float>(splits[1]);
-//				newD.y = boost::lexical_cast<float>(splits[2]);
-//				texDataList.push_back(newD);
-//				continue;
-//			}
-//			if (splits[0] == "vn") {
-//				DirectX::XMFLOAT3 newNormal;
-//				newNormal.x = boost::lexical_cast<float>(splits[1]);
-//				newNormal.y = boost::lexical_cast<float>(splits[2]);
-//				newNormal.z = boost::lexical_cast<float>(splits[3]);
-//				normalDataList.push_back(newNormal);
-//				continue;
-//			}
-//			if (splits[0] == "f") {
-//				for (int i = 1; i < splits.size(); i++) {
-//					temp2 = splits[i];
-//					boost::split(subSplits, temp2, boost::is_any_of("/"));
-//					if (subSplits.size() == 1) {
-//						WORD ind1 = boost::lexical_cast<WORD>(subSplits[0]) - 1;
-//						vert.pos.x = vertList[ind1].pos.x;
-//						vert.pos.y = vertList[ind1].pos.y;
-//						vert.pos.z = vertList[ind1].pos.z;
-//						vert.color = vertList[ind1].color;
-//					}
-//					if (subSplits.size() == 2) {
-//						WORD ind1 = boost::lexical_cast<WORD>(subSplits[0]) - 1;
-//						WORD ind2 = boost::lexical_cast<WORD>(subSplits[1]) - 1;
-//						vert.pos.x = vertList[ind1].pos.x;
-//						vert.pos.y = vertList[ind1].pos.y;
-//						vert.pos.z = vertList[ind1].pos.z;
-//						vert.color = vertList[ind1].color;
-//						vert.texCoord.y = -texDataList[ind2].y;
-//						vert.texCoord.x = texDataList[ind2].x;
-//					}
-//					if (subSplits.size() == 3) {
-//						WORD ind1, ind2, ind3;
-//						ind1 = boost::lexical_cast<WORD>(subSplits[0]) - 1;
-//						if (subSplits[1] != "") {
-//							ind2 = boost::lexical_cast<WORD>(subSplits[1]) - 1;
-//							vert.texCoord.y = -texDataList[ind2].y;
-//							vert.texCoord.x = texDataList[ind2].x;
-//						}
-//						if (subSplits[2] != "") {
-//							ind3 = boost::lexical_cast<WORD>(subSplits[2]) - 1;
-//							vert.normal = normalDataList[ind3];
-//						}
-//						vert.pos.x = vertList[ind1].pos.x;
-//						vert.pos.y = vertList[ind1].pos.y;
-//						vert.pos.z = vertList[ind1].pos.z;
-//						vert.color = vertList[ind1].color;
-//					}
-//
-//					int index = -1;
-//					for (int i = 0; i < verticesI; i++) {
-//						if (memcmp(&object->verts[i], &vert, sizeof(SimpleVertex)) == 0) index = i;
-//					}
-//					//ƒобавление
-//					if (index < 0)
-//					{
-//						
-//						object->verts.push_back(vert);
-//						verticesI++;
-//						index = verticesI-1;
-//					}
-//					object->inds.push_back(index);
-//					indicesI++;
-//				}
-//			}
-//			
-//		}
-//		*out = object;
-//		return S_OK;
-//	}
-//	return E_FAIL;
-//
-//}
-
-
 ModelLoader::ModelLoader()
 {
 }
 
 ModelLoader::~ModelLoader()
 {
+	scene->~aiScene();
 }
 
 bool ModelLoader::Load(HWND hwnd, ID3D11Device * device, ID3D11DeviceContext * devCon, std::string filename)
 {
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(filename,
-		aiProcess_Triangulate | aiProcess_RemoveRedundantMaterials | // remove redundant materials
+	importer.ReadFile(filename,
+		aiProcess_Triangulate |
+		aiProcess_RemoveRedundantMaterials | // remove redundant materials
 		aiProcess_FindDegenerates | // remove degenerated polygons from the import
 		aiProcess_FindInvalidData |
 		aiProcess_SortByPType  |
-		aiProcess_ConvertToLeftHanded |
-	aiProcess_FlipUVs);
-	if (scene == nullptr) return false;
+		aiProcess_FlipUVs |
+		aiProcess_ConvertToLeftHanded);
+	aiScene* sceneI = importer.GetOrphanedScene();
+	if (sceneI == nullptr) return false;
+	this->scene = sceneI;
 	this->filepath = filename.substr(0, filename.find_last_of("/\\"));
 	this->device = device;
 	this->devCon = devCon;
@@ -147,11 +43,31 @@ void ModelLoader::Draw(ID3D11DeviceContext * devCon)
 
 std::string texType;
 
-Mesh ModelLoader::processMesh(aiMesh * mesh, const aiScene * scene)
+DirectX::XMMATRIX aiToXMMATRIX(const aiMatrix4x4& AssimpMatrix) //делаем из aiMatrix(assimp) -> матрицу из директа(XMfloat4x4)
 {
-	std::vector<SimpleVertex> vertices;
-	std::vector<UINT> indices;
-	std::vector<Texture> textures;
+	DirectX::XMMATRIX m;
+	m = DirectX::XMMatrixIdentity();
+	DirectX::XMMatrixSet(
+	AssimpMatrix.a1, AssimpMatrix.a2, AssimpMatrix.a3, AssimpMatrix.a4,
+	AssimpMatrix.b1, AssimpMatrix.b2, AssimpMatrix.b3, AssimpMatrix.b4,
+	AssimpMatrix.c1, AssimpMatrix.c2, AssimpMatrix.c3, AssimpMatrix.c4,
+	AssimpMatrix.d1, AssimpMatrix.d2, AssimpMatrix.d3, AssimpMatrix.d4);
+	return m;
+}
+
+
+
+Mesh ModelLoader::processMesh(aiMesh * mesh, aiScene * scene)
+{
+	Mesh *curMeshP;
+	curMeshP = new Mesh;
+	Mesh &curMesh = *curMeshP;
+
+	//std::vector<SimpleVertex> vertices;
+	//std::vector<UINT> indices;
+	//std::vector<Texture> textures;
+	//std::map<std::string, UINT> boneMap;
+	//std::vector<Bone> boneList;
 
 	if (mesh->mMaterialIndex >= 0) {
 		aiMaterial* mat = scene->mMaterials[mesh->mMaterialIndex];
@@ -177,31 +93,73 @@ Mesh ModelLoader::processMesh(aiMesh * mesh, const aiScene * scene)
 			vertex.texCoord.y = (float)mesh->mTextureCoords[0][i].y;
 		}
 
-		vertices.push_back(vertex);
+		curMesh.vertices.push_back(vertex);
 	}
 
 	for (UINT i = 0; i < mesh->mNumFaces; i++) {
 		aiFace face = mesh->mFaces[i];
 
 		for (UINT j = 0; j < face.mNumIndices; j++)
-			indices.push_back(face.mIndices[j]);
+			curMesh.indices.push_back(face.mIndices[j]);
 	}
+
+	if (mesh->HasBones()) {
+		UINT boneIndex = 0;
+		for (UINT i = 0; i < mesh->mNumBones; i++) {
+			std::string boneName(mesh->mBones[i]->mName.data);
+			if (curMesh.boneMap.find(boneName) == curMesh.boneMap.end()) {
+				Bone bone;
+				bone.offsetMat = aiToXMMATRIX(mesh->mBones[i]->mOffsetMatrix);
+				curMesh.boneList.push_back(bone);
+				curMesh.boneMap.insert(std::make_pair(boneName, boneIndex));
+				boneIndex++;
+			}
+			else{
+				boneIndex = curMesh.boneMap[boneName];
+			}
+			for (UINT j = 0; j < mesh->mBones[i]->mNumWeights; j++) {
+				if (j < 4) {
+					UINT vertID = mesh->mBones[i]->mWeights[j].mVertexId;
+					float weight = mesh->mBones[i]->mWeights[j].mWeight;
+					if (j == 0) {
+						curMesh.vertices[vertID].boneIDs.x = boneIndex;
+						curMesh.vertices[vertID].boneWeights.x = weight;
+					}
+					if (j == 1) {
+						curMesh.vertices[vertID].boneIDs.y = boneIndex;
+						curMesh.vertices[vertID].boneWeights.y = weight;
+					}
+					if (j == 2) {
+						curMesh.vertices[vertID].boneIDs.z = boneIndex;
+						curMesh.vertices[vertID].boneWeights.z = weight;
+					}
+					if (j == 3) {
+						curMesh.vertices[vertID].boneIDs.w = boneIndex;
+						curMesh.vertices[vertID].boneWeights.w = weight;
+					}
+				}
+			}
+		}
+	}
+	 
 
 	if (mesh->mMaterialIndex >= 0) {
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
 		std::vector<Texture> diffuseMaps = this->loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse", scene);
-		textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+		curMesh.textures.insert(curMesh.textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 	}
 
-	return Mesh(device, vertices, indices, textures);
+	return Mesh(scene, device, curMesh.vertices, curMesh.indices, curMesh.textures, curMesh.boneMap, curMesh.boneList);
 }
 
-void ModelLoader::processNode(aiNode * node, const aiScene * scene)
+void ModelLoader::processNode(aiNode * node, aiScene * scene)
 {
 	for (UINT i = 0; i < node->mNumMeshes; i++) {
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-		meshes.push_back(this->processMesh(mesh, scene));
+		Mesh meshA = this->processMesh(mesh, scene);
+		meshA.meshInitTransform = aiToXMMATRIX(scene->mRootNode->mTransformation);
+		meshes.push_back(meshA);
 	}
 
 	for (UINT i = 0; i < node->mNumChildren; i++) {
@@ -211,7 +169,7 @@ void ModelLoader::processNode(aiNode * node, const aiScene * scene)
 
 
 
-std::vector<Texture> ModelLoader::loadMaterialTextures(aiMaterial * mat, aiTextureType type, std::string typeName, const aiScene * scene)
+std::vector<Texture> ModelLoader::loadMaterialTextures(aiMaterial * mat, aiTextureType type, std::string typeName,  aiScene * scene)
 {
 	std::vector<Texture> textures;
 	for (UINT i = 0; i < mat->GetTextureCount(type); i++) {

@@ -2,12 +2,14 @@
 
 #include <directXmath.h>
 #include <DxEngine.h>
-
+using namespace DirectX;
 class Mesh;
 
-extern DirectX::XMMATRIX g_World;
-extern DirectX::XMMATRIX g_View;
-extern DirectX::XMMATRIX g_Projection;
+extern XMMATRIX g_World;
+extern XMMATRIX g_View;
+extern XMMATRIX g_Projection;
+
+extern ID3D11Buffer* g_pConstantBufferBones;
 
 extern ID3D11Texture2D* g_depthBuffer;
 extern ID3D11DepthStencilView* g_depthStencil;
@@ -25,12 +27,17 @@ extern std::vector<ID3D11Buffer*> g_VBA;
 extern std::vector<ID3D11Buffer*> g_IBA;
 
 struct ConstantBuffer {
-	DirectX::XMMATRIX mWorld;
-	DirectX::XMMATRIX mView;
-	DirectX::XMMATRIX mProjection;
-	DirectX::XMFLOAT4 colorLight;
-	DirectX::XMFLOAT3 directionLight;
-	DirectX::XMFLOAT2 time;
+	XMMATRIX mWorld;
+	XMMATRIX mView;
+	XMMATRIX mProjection;
+	XMFLOAT4 colorLight;
+	XMFLOAT3 directionLight;
+	XMFLOAT2 time;
+	//XMMATRIX bones[100];
+};
+
+struct BonesCB {
+	XMMATRIX bones[1000];
 };
 
 void InitSamplerState();
