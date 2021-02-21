@@ -11,6 +11,7 @@
 
 //Core headers
 #include "core/InitWindow.h"
+#include "core/Time.h"
 
 //Controls
 #include <controls/Camera.h>

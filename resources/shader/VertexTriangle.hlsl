@@ -36,17 +36,22 @@ struct VS_INPUT
 PS_INPUT vs_main(VS_INPUT input)
 {
 	PS_INPUT output;
-    float4x4 BoneTransform = bones[input.boneIds[0]] * input.boneWiegth[0];
-    BoneTransform += bones[input.boneIds[1]] * input.boneWiegth[1];
-    BoneTransform += bones[input.boneIds[2]] * input.boneWiegth[2];
+    matrix BoneTransform = bones[input.boneIds[0]] * input.boneWiegth[0];
+    BoneTransform +=bones[input.boneIds[1]] * input.boneWiegth[1];
+    BoneTransform +=bones[input.boneIds[2]] * input.boneWiegth[2];
     BoneTransform += bones[input.boneIds[3]] * input.boneWiegth[3];
     //output.Pos = mul(input.Pos, BoneTransform);
-    output.Pos = mul(input.Pos, World);
-    output.Pos = mul(output.Pos, World);
+   // output.Pos = mul(input.Pos, World);
+    output.Pos = mul(input.Pos, BoneTransform);
+   // matrix vp  = mul(View, Projection);
+    //output.Pos = mul(output.Pos, vp);
 	output.Pos = mul(output.Pos, View);
-	output.Pos = mul(output.Pos, Projection);
+    output.Pos = mul(output.Pos, Projection);
+   // output.Pos = mul(BoneTransform, vp);
+   
 	output.Color = input.Color;
 	output.Texcoord = input.Texcoord;
+    
 	output.Normal = normalize(input.Normal);
 	return output;
 }

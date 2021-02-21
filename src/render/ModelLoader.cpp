@@ -47,7 +47,7 @@ DirectX::XMMATRIX aiToXMMATRIX(const aiMatrix4x4& AssimpMatrix) //делаем из aiMa
 {
 	DirectX::XMMATRIX m;
 	m = DirectX::XMMatrixIdentity();
-	DirectX::XMMatrixSet(
+	m = DirectX::XMMatrixSet(
 	AssimpMatrix.a1, AssimpMatrix.a2, AssimpMatrix.a3, AssimpMatrix.a4,
 	AssimpMatrix.b1, AssimpMatrix.b2, AssimpMatrix.b3, AssimpMatrix.b4,
 	AssimpMatrix.c1, AssimpMatrix.c2, AssimpMatrix.c3, AssimpMatrix.c4,
@@ -55,14 +55,48 @@ DirectX::XMMATRIX aiToXMMATRIX(const aiMatrix4x4& AssimpMatrix) //делаем из aiMa
 	return m;
 }
 
+DirectX::XMMATRIX aiToXMMATRIX(const aiMatrix3x3& AssimpMatrix) //делаем из aiMatrix(assimp) -> матрицу из директа(XMfloat4x4)
+{
+	DirectX::XMMATRIX m;
+	m = DirectX::XMMatrixIdentity();
+	m = DirectX::XMMatrixSet(
+		AssimpMatrix.a1, AssimpMatrix.a2, AssimpMatrix.a3, 0,
+		AssimpMatrix.b1, AssimpMatrix.b2, AssimpMatrix.b3, 0,
+		AssimpMatrix.c1, AssimpMatrix.c2, AssimpMatrix.c3, 0,
+		0,0, 0, 1);
+	return m;
+}
+
+void AddBoneData(SimpleVertex &vert, UINT boneID, float weight) {
+		if (vert.boneWeights.x == 0.0) {
+			vert.boneIDs.x = boneID;
+			vert.boneWeights.x = weight;
+			return;
+		}
+		if (vert.boneWeights.y == 0.0) {
+			vert.boneIDs.y = boneID;
+			vert.boneWeights.y = weight;
+			return;
+		}
+		if (vert.boneWeights.z == 0.0) {
+			vert.boneIDs.z = boneID;
+			vert.boneWeights.z = weight;
+			return;
+		}
+		if (vert.boneWeights.w == 0.0) {
+			vert.boneIDs.w = boneID;
+			vert.boneWeights.w = weight;
+			return;
+		}
+}
+
 
 
 Mesh ModelLoader::processMesh(aiMesh * mesh, aiScene * scene)
 {
 	Mesh *curMeshP;
-	curMeshP = new Mesh;
+	curMeshP = new Mesh();
 	Mesh &curMesh = *curMeshP;
-
 	//std::vector<SimpleVertex> vertices;
 	//std::vector<UINT> indices;
 	//std::vector<Texture> textures;
@@ -103,46 +137,35 @@ Mesh ModelLoader::processMesh(aiMesh * mesh, aiScene * scene)
 			curMesh.indices.push_back(face.mIndices[j]);
 	}
 
+
 	if (mesh->HasBones()) {
-		UINT boneIndex = 0;
+		this->numBones = 0;
 		for (UINT i = 0; i < mesh->mNumBones; i++) {
+			UINT boneIndex = 0;
 			std::string boneName(mesh->mBones[i]->mName.data);
 			if (curMesh.boneMap.find(boneName) == curMesh.boneMap.end()) {
+				boneIndex = numBones;
+				numBones++;
 				Bone bone;
-				bone.offsetMat = aiToXMMATRIX(mesh->mBones[i]->mOffsetMatrix);
+				//bone.offsetMat = aiToXMMATRIX(mesh->mBones[i]->mOffsetMatrix);
 				curMesh.boneList.push_back(bone);
-				curMesh.boneMap.insert(std::make_pair(boneName, boneIndex));
-				boneIndex++;
+				//curMesh.boneMap.insert(std::make_pair(boneName, boneIndex));
 			}
 			else{
 				boneIndex = curMesh.boneMap[boneName];
 			}
+			curMesh.boneMap[boneName] = boneIndex;
+			curMesh.boneList[boneIndex].offsetMat = aiToXMMATRIX(mesh->mBones[i]->mOffsetMatrix);
+
 			for (UINT j = 0; j < mesh->mBones[i]->mNumWeights; j++) {
-				if (j < 4) {
-					UINT vertID = mesh->mBones[i]->mWeights[j].mVertexId;
-					float weight = mesh->mBones[i]->mWeights[j].mWeight;
-					if (j == 0) {
-						curMesh.vertices[vertID].boneIDs.x = boneIndex;
-						curMesh.vertices[vertID].boneWeights.x = weight;
-					}
-					if (j == 1) {
-						curMesh.vertices[vertID].boneIDs.y = boneIndex;
-						curMesh.vertices[vertID].boneWeights.y = weight;
-					}
-					if (j == 2) {
-						curMesh.vertices[vertID].boneIDs.z = boneIndex;
-						curMesh.vertices[vertID].boneWeights.z = weight;
-					}
-					if (j == 3) {
-						curMesh.vertices[vertID].boneIDs.w = boneIndex;
-						curMesh.vertices[vertID].boneWeights.w = weight;
-					}
-				}
+				UINT vertID = mesh->mBones[i]->mWeights[j].mVertexId;
+				float weight = mesh->mBones[i]->mWeights[j].mWeight;
+				AddBoneData(curMesh.vertices[vertID], boneIndex, weight);
 			}
 		}
 	}
 	 
-
+	
 	if (mesh->mMaterialIndex >= 0) {
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
@@ -166,7 +189,6 @@ void ModelLoader::processNode(aiNode * node, aiScene * scene)
 		this->processNode(node->mChildren[i], scene);
 	}
 }
-
 
 
 std::vector<Texture> ModelLoader::loadMaterialTextures(aiMaterial * mat, aiTextureType type, std::string typeName,  aiScene * scene)

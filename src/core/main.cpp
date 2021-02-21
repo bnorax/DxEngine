@@ -157,6 +157,7 @@ void Render(ImGuiIO &io, DxEngine::EditorCamera &camera, std::vector<Mesh> &allO
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	Time::Instance();
 	DxEngine::OSWindow mainWindow(1920, 1080,_T("MainWindow"));
 	g_hWnd = mainWindow.hWnd;
 	mainWindow.InitWindow();

@@ -6,6 +6,7 @@
 #include <assimp/postprocess.h>
 #include <WICTextureLoader.h>
 #include <directXmath.h>
+#include "render/Mesh.h"
 
 class Mesh;
 struct Texture;
@@ -25,6 +26,7 @@ private:
 	std::vector<Texture> loadedTextures;
 	std::string filepath;
 	DirectX::XMMATRIX globalInverseTransform;
+	UINT numBones = 0;
 	
 
 	void processNode(aiNode* node, aiScene* scene);
@@ -38,3 +40,4 @@ private:
 };
 
 DirectX::XMMATRIX aiToXMMATRIX(const aiMatrix4x4& AssimpMatrix);
+DirectX::XMMATRIX aiToXMMATRIX(const aiMatrix3x3& AssimpMatrix);

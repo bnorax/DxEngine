@@ -4,15 +4,18 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include "core/Time.h"
 
+
+class ModLoader;
 
 	struct SimpleVertex {
 		DirectX::XMFLOAT3 pos;
 		DirectX::XMFLOAT4 color;
 		DirectX::XMFLOAT2 texCoord;
 		DirectX::XMFLOAT3 normal;
-		DirectX::XMUINT4 boneIDs;
-		DirectX::XMFLOAT4 boneWeights;
+		DirectX::XMUINT4 boneIDs = {0, 0, 0, 0};
+		DirectX::XMFLOAT4 boneWeights = { 0, 0, 0, 0 };
 		//std::map<UINT, float> boneInfo; //<boneID, boneWeight>
 	};
 
@@ -33,15 +36,14 @@
 
 	class Mesh {
 	public:
+		Mesh();
 		std::vector<SimpleVertex> vertices;
 		std::vector<UINT> indices;
 		std::vector<Texture> textures;
 		std::map<std::string, UINT> boneMap; //second parameter = position in vector if bones
 		std::vector<Bone> boneList;
 		DirectX::XMMATRIX meshInitTransform;
-		aiScene *scene;
-
-		Mesh();
+		aiScene *scene;;
 		ID3D11Device *device;
 		Mesh(aiScene *ascene, ID3D11Device *dev, const std::vector<SimpleVertex> vert, const std::vector<UINT> ind, const std::vector<Texture>& tex, const std::map<std::string, UINT> boneM, const std::vector<Bone> boneL);
 		void BoneTransform(float timeInSeconds);
