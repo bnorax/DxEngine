@@ -269,7 +269,7 @@ int Model::getTextureIndex(aiString * str)
 void Model::getTextureFromModel(const aiScene * scene, ID3D11ShaderResourceView **texView, int textureIndex)
 {
 	HRESULT hr;
-	hr = DirectX::CreateWICTextureFromMemory(device, (const uint8_t*)(scene->mTextures[textureIndex]->pcData), scene->mTextures[textureIndex]->mWidth, nullptr, texView);
+	hr = DirectX::CreateWICTextureFromMemory(device, devCon, (const uint8_t*)(scene->mTextures[textureIndex]->pcData), scene->mTextures[textureIndex]->mWidth, nullptr, texView);
 	//int* size = reinterpret_cast<int*>(&scene->mTextures[textureIndex]->mWidth);
 	//hr = DirectX::CreateWICTextureFromMemory(device, devCon, reinterpret_cast<unsigned char*>(scene->mTextures[textureIndex]->pcData), *size, nullptr, texView);
 	if (FAILED(hr))

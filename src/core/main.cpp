@@ -53,7 +53,7 @@ HWND g_hWnd;
 void Render(ImGuiIO &io, DxEngine::EditorCamera &camera, std::vector<Mesh> &allObjects, Model &loader, DxEngine::FrameStat frameStats) {
 	//imgui
 
-	g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, DirectX::Colors::Black);
+	g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, DirectX::Colors::DarkGray);
 	g_pd3dDeviceContext->ClearDepthStencilView(g_depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	static float t = 0.0f;
 	static ULONGLONG timeStart = 0;
