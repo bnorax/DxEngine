@@ -24,6 +24,7 @@ bool ModelLoader::Load(HWND hwnd, ID3D11Device * device, ID3D11DeviceContext * d
 		aiProcess_ConvertToLeftHanded);
 	aiScene* sceneI = importer.GetOrphanedScene();
 	if (sceneI == nullptr) return false;
+	this->globalInverseTransform = aiToXMMATRIX(sceneI->mRootNode->mTransformation);
 	this->scene = sceneI;
 	this->filepath = filename.substr(0, filename.find_last_of("/\\"));
 	this->device = device;
@@ -52,6 +53,7 @@ DirectX::XMMATRIX aiToXMMATRIX(const aiMatrix4x4& AssimpMatrix) //делаем из aiMa
 	AssimpMatrix.b1, AssimpMatrix.b2, AssimpMatrix.b3, AssimpMatrix.b4,
 	AssimpMatrix.c1, AssimpMatrix.c2, AssimpMatrix.c3, AssimpMatrix.c4,
 	AssimpMatrix.d1, AssimpMatrix.d2, AssimpMatrix.d3, AssimpMatrix.d4);
+	m = DirectX::XMMatrixTranspose(m);
 	return m;
 }
 
@@ -64,6 +66,7 @@ DirectX::XMMATRIX aiToXMMATRIX(const aiMatrix3x3& AssimpMatrix) //делаем из aiMa
 		AssimpMatrix.b1, AssimpMatrix.b2, AssimpMatrix.b3, 0,
 		AssimpMatrix.c1, AssimpMatrix.c2, AssimpMatrix.c3, 0,
 		0,0, 0, 1);
+	m = DirectX::XMMatrixTranspose(m);
 	return m;
 }
 
@@ -95,8 +98,11 @@ void AddBoneData(SimpleVertex &vert, UINT boneID, float weight) {
 Mesh ModelLoader::processMesh(aiMesh * mesh, aiScene * scene)
 {
 	Mesh *curMeshP;
-	curMeshP = new Mesh();
+	curMeshP = new Mesh;
 	Mesh &curMesh = *curMeshP;
+	curMesh.globalInverseTransform = this->globalInverseTransform;
+	curMesh.device = device;
+	curMesh.scene = scene;
 	//std::vector<SimpleVertex> vertices;
 	//std::vector<UINT> indices;
 	//std::vector<Texture> textures;
@@ -172,17 +178,15 @@ Mesh ModelLoader::processMesh(aiMesh * mesh, aiScene * scene)
 		std::vector<Texture> diffuseMaps = this->loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse", scene);
 		curMesh.textures.insert(curMesh.textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 	}
-
-	return Mesh(scene, device, curMesh.vertices, curMesh.indices, curMesh.textures, curMesh.boneMap, curMesh.boneList);
+	curMesh.MeshInit();
+	return curMesh;
 }
 
 void ModelLoader::processNode(aiNode * node, aiScene * scene)
 {
 	for (UINT i = 0; i < node->mNumMeshes; i++) {
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-		Mesh meshA = this->processMesh(mesh, scene);
-		meshA.meshInitTransform = aiToXMMATRIX(scene->mRootNode->mTransformation);
-		meshes.push_back(meshA);
+		meshes.push_back(this->processMesh(mesh, scene));
 	}
 
 	for (UINT i = 0; i < node->mNumChildren; i++) {

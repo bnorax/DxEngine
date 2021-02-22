@@ -16,6 +16,8 @@ public:
 	ModelLoader();
 	~ModelLoader();
 	aiScene *scene;
+	DirectX::XMMATRIX globalInverseTransform;
+
 	bool Load(HWND hwnd, ID3D11Device *device, ID3D11DeviceContext *devCon, std::string filename);
 	void Draw(ID3D11DeviceContext *devCon);
 private:
@@ -25,7 +27,6 @@ private:
 	std::vector<Mesh> meshes;
 	std::vector<Texture> loadedTextures;
 	std::string filepath;
-	DirectX::XMMATRIX globalInverseTransform;
 	UINT numBones = 0;
 	
 

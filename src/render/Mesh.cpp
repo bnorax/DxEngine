@@ -8,14 +8,15 @@ Mesh::Mesh()
 {
 }
 
-Mesh::Mesh(aiScene *ascene, ID3D11Device *dev, const std::vector<SimpleVertex> vert, const std::vector<UINT> ind, const std::vector<Texture>& tex, const std::map<std::string, UINT> boneM, const std::vector<Bone> boneL) :
+Mesh::Mesh(aiScene *ascene, DirectX::XMMATRIX glTransform, ID3D11Device *dev, const std::vector<SimpleVertex> vert, const std::vector<UINT> ind, const std::vector<Texture>& tex, const std::map<std::string, UINT> boneM, const std::vector<Bone> boneL) :
 		vertices(vert),
 		indices(ind),
 		textures(tex),
 		device(dev),
 		boneList(boneL),
 		boneMap(boneM),
-		scene(ascene)
+		scene(ascene),
+		globalInverseTransform(glTransform)
 {
 	HRESULT hr;
 	D3D11_BUFFER_DESC vbd;
@@ -47,6 +48,38 @@ Mesh::Mesh(aiScene *ascene, ID3D11Device *dev, const std::vector<SimpleVertex> v
 	}
 }
 
+void Mesh::MeshInit()
+{
+	HRESULT hr;
+	D3D11_BUFFER_DESC vbd;
+	vbd.Usage = D3D11_USAGE_IMMUTABLE;
+	vbd.ByteWidth = static_cast<UINT>(sizeof(SimpleVertex) * vertices.size());
+	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vbd.CPUAccessFlags = 0;
+	vbd.MiscFlags = 0;
+
+	D3D11_SUBRESOURCE_DATA initData;
+	initData.pSysMem = &vertices[0];
+
+	hr = device->CreateBuffer(&vbd, &initData, vertexBuffer.GetAddressOf());
+	if (FAILED(hr)) {
+		throw std::runtime_error("Failed to create vertex buffer.");
+	}
+
+	D3D11_BUFFER_DESC ibd;
+	ibd.Usage = D3D11_USAGE_IMMUTABLE;
+	ibd.ByteWidth = static_cast<UINT>(sizeof(UINT) * indices.size());
+	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	ibd.CPUAccessFlags = 0;
+	ibd.MiscFlags = 0;
+
+	initData.pSysMem = &indices[0];
+	hr = device->CreateBuffer(&ibd, &initData, indexBuffer.GetAddressOf());
+	if (FAILED(hr)) {
+		throw std::runtime_error("Failed to create index buffer.");
+	}
+}
+
 void Mesh::BoneTransform(float timeInSeconds)
 {
 	DirectX::XMMATRIX fullBoneTransform = XMMatrixIdentity();
@@ -55,9 +88,6 @@ void Mesh::BoneTransform(float timeInSeconds)
 	float TimeInTicks = timeInSeconds * TicksPerSecond;
 	float AnimationTime = fmod(TimeInTicks, scene->mAnimations[0]->mDuration);
 	//float AnimationTime = scene->mAnimations[0]->mDuration / scene->mAnimations[0]->mTicksPerSecond;
-	if (AnimationTime <= 0) {
-		int a =2 ;
-	}
 	ReadNodeHeirarchy(AnimationTime, scene->mRootNode, fullBoneTransform);
 
 }
@@ -188,9 +218,9 @@ void Mesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const XMM
 		// Interpolate rotation and generate rotation transformation matrix
 		aiQuaternion RotationQ;
 		CalcInterpolatedRotation(RotationQ, AnimationTime, pNodeAnim);
-		DirectX::XMVECTOR r = DirectX::XMVectorSet(RotationQ.w, RotationQ.x, RotationQ.y, RotationQ.z);
-		DirectX::XMMATRIX rotM = DirectX::XMMatrixRotationQuaternion(r);
-		//DirectX::XMMATRIX rotM = DirectX::XMMatrixRotationQuaternion(DirectX::XMVectorSet(RotationQ.w, RotationQ.x, RotationQ.y, RotationQ.z));
+		//DirectX::XMVECTOR r = DirectX::XMVectorSet(RotationQ.w, RotationQ.x, RotationQ.y, RotationQ.z);
+		DirectX::XMMATRIX rotM = aiToXMMATRIX(RotationQ.GetMatrix());
+		//DirectX::XMMATRIX rotM = DirectX::XMMatrixRotationQuaternion(DirectX::XMVectorSet(RotationQ.x, RotationQ.y, RotationQ.z, RotationQ.w));
 
 		// Interpolate translation and generate translation transformation matrix
 		aiVector3D Translation;
@@ -198,13 +228,16 @@ void Mesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const XMM
 		DirectX::XMMATRIX translM = DirectX::XMMatrixTranslation(Translation.x, Translation.y, Translation.z);
 		// Combine the above transformations
 		NodeTransformation = scaleM* rotM * translM;
+		//NodeTransformation = DirectX::XMMatrixTranspose(NodeTransformation);
 	}
 
-	XMMATRIX GlobalTransformation = ParentTransform * NodeTransformation;
+	XMMATRIX GlobalTransformation =   NodeTransformation * ParentTransform;
+	//XMMATRIX GlobalTransformation =ParentTransform* NodeTransformation ;
 
 	if (boneMap.find(NodeName) != boneMap.end()) {
 		UINT BoneIndex = boneMap[NodeName];
-		boneList[BoneIndex].finalTransform = DirectX::XMMatrixInverse(nullptr, meshInitTransform) * GlobalTransformation * boneList[BoneIndex].offsetMat; //все оффсеты identity ищем трабл парсинга
+		boneList[BoneIndex].finalTransform = boneList[BoneIndex].offsetMat *  GlobalTransformation * globalInverseTransform;
+		//boneList[BoneIndex].finalTransform = globalInverseTransform *  GlobalTransformation * boneList[BoneIndex].offsetMat;
 	}
 
 	for (UINT i = 0; i < pNode->mNumChildren; i++) {
@@ -242,9 +275,6 @@ void Mesh::Draw(ID3D11DeviceContext *devcon) {
 		bonesCB.bones[i] = XMMatrixTranspose(boneList[i].finalTransform);
 		//bonesCB.bones[i] = boneList[i].finalTransform;
 	}
-	//for (UINT i = boneList.size(); i < 100 - boneList.size(); i++) {
-	//	//bonesCB.bones[i] = DirectX::XMMatrixIdentity();
-	//}
 	cb.mWorld = XMMatrixTranspose(g_World);
 	cb.mView = XMMatrixTranspose(g_View);
 	cb.mProjection = XMMatrixTranspose(g_Projection);

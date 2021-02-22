@@ -36,17 +36,12 @@ class ModLoader;
 
 	class Mesh {
 	public:
-		Mesh();
-		std::vector<SimpleVertex> vertices;
-		std::vector<UINT> indices;
-		std::vector<Texture> textures;
-		std::map<std::string, UINT> boneMap; //second parameter = position in vector if bones
-		std::vector<Bone> boneList;
-		DirectX::XMMATRIX meshInitTransform;
-		aiScene *scene;;
-		ID3D11Device *device;
-		Mesh(aiScene *ascene, ID3D11Device *dev, const std::vector<SimpleVertex> vert, const std::vector<UINT> ind, const std::vector<Texture>& tex, const std::map<std::string, UINT> boneM, const std::vector<Bone> boneL);
-		void BoneTransform(float timeInSeconds);
+		Mesh(); //constructors
+		Mesh(aiScene *ascene, DirectX::XMMATRIX glTransform, ID3D11Device *dev, const std::vector<SimpleVertex> vert, const std::vector<UINT> ind, const std::vector<Texture>& tex, const std::map<std::string, UINT> boneM, const std::vector<Bone> boneL);
+
+
+		void MeshInit();
+		void BoneTransform(float timeInSeconds);//methods
 		UINT FindPosition(float AnimationTime, const aiNodeAnim * pNodeAnim);
 		UINT FindRotation(float AnimationTime, const aiNodeAnim * pNodeAnim);
 		UINT FindScaling(float AnimationTime, const aiNodeAnim * pNodeAnim);
@@ -56,7 +51,16 @@ class ModLoader;
 		void ReadNodeHeirarchy(float AnimationTime, const aiNode * pNode, const DirectX::XMMATRIX& ParentTransform);
 		const aiNodeAnim * FindNodeAnim(const aiAnimation * pAnimation, const std::string NodeName);
 		void Draw(ID3D11DeviceContext *devcon);
-		//void LoadBones();
+
+		std::vector<SimpleVertex> vertices;//data
+		std::vector<UINT> indices;
+		std::vector<Texture> textures;
+		std::map<std::string, UINT> boneMap; //second parameter = position in vector if bones
+		std::vector<Bone> boneList;
+		aiScene *scene;;
+		DirectX::XMMATRIX globalInverseTransform;
+		ID3D11Device *device;
+		
 	private:
 		Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer, indexBuffer;
 	};
