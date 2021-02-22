@@ -53,7 +53,7 @@ HWND g_hWnd;
 void Render(ImGuiIO &io, DxEngine::EditorCamera &camera, std::vector<Mesh> &allObjects, ModelLoader &loader) {
 	//imgui
 
-	g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, DirectX::Colors::MidnightBlue);
+	g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, DirectX::Colors::Black);
 	g_pd3dDeviceContext->ClearDepthStencilView(g_depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	static float t = 0.0f;
 	static ULONGLONG timeStart = 0;
@@ -92,7 +92,8 @@ void Render(ImGuiIO &io, DxEngine::EditorCamera &camera, std::vector<Mesh> &allO
 //translate = DirectX::XMMatrixTranslation(sin(t)*2.0f, 2.0f*cos(t), cos(t)*sin(t));
 //g_World = DirectX::XMMatrixRotationY(t*0.5f)  * translate;
 	float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	//g_pd3dDeviceContext->OMSetBlendState(g_blendState, blendFactor, 0xffffffff);
+	g_pd3dDeviceContext->OMSetBlendState(g_blendState, blendFactor, 0xffffffff);
+	g_pd3dDeviceContext->OMSetDepthStencilState(g_depthStencilState, 0);
 
 	g_pd3dDeviceContext->VSSetShader(vertex_shader_ptr, nullptr, 0);
 	// g_pd3dDeviceContext->VSSetShader(vertex_shader_ptr, nullptr, 0);
@@ -148,9 +149,14 @@ void Render(ImGuiIO &io, DxEngine::EditorCamera &camera, std::vector<Mesh> &allO
 	//	}
 	//	g_pd3dDeviceContext->DrawIndexed((UINT)allObjects[i].indices.size(), 0, 0);
 	//}
-	/*spriteBatch->Begin();
-	spriteFont->DrawString(spriteBatch.get(), L"PGIZ laba", DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0, DirectX::XMFLOAT2(0, 0), 1);
-	spriteBatch->End();*/
+	
+	g_pSwapChain->Present(1, 0);
+}
+
+void RenderUI(DxEngine::FrameStat frameStats) {
+	spriteBatch->Begin();
+	spriteFont->DrawString(spriteBatch.get(), std::to_string(frameStats.GetFps()).c_str(), DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0, DirectX::XMFLOAT2(0, 0), 1);
+	spriteBatch->End();
 	g_pSwapChain->Present(1, 0);
 }
 
@@ -158,6 +164,7 @@ void Render(ImGuiIO &io, DxEngine::EditorCamera &camera, std::vector<Mesh> &allO
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	Time::Instance();
+	DxEngine::FrameStat frameStat;
 	DxEngine::OSWindow mainWindow(1920, 1080,_T("MainWindow"));
 	g_hWnd = mainWindow.hWnd;
 	mainWindow.InitWindow();
@@ -233,6 +240,9 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
 	MSG msg = {};
 	ZeroMemory(&msg, sizeof(msg));
+
+
+	//frames stat
 	while (WM_QUIT != msg.message)
 	{
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
@@ -242,7 +252,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			continue;
 		}
 		else {
+			frameStat.StatBegin();
 			Render(io, camera, allObjects, loader);
+			frameStat.StatEnd();
+			RenderUI(frameStat);
 		}
 	}
 

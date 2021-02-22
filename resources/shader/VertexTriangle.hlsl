@@ -9,7 +9,7 @@ cbuffer ConstantBuffer : register(b1)
 };
 cbuffer bones : register(b2)
 {
-    matrix bones[1000];
+    matrix bones[200];
 }
 //--------------------------------------------------------------------------------------
 struct PS_INPUT

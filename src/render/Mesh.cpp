@@ -271,7 +271,7 @@ void Mesh::Draw(ID3D11DeviceContext *devcon) {
 	BonesCB bonesCB;
 	float a = (float)time.GetTimeInMillisSinceAppStart();
 	BoneTransform(a / 1000);
-	for (UINT i = 0; i < boneList.size() && i<1000; i++) {
+	for (UINT i = 0; i < boneList.size() && i<200; i++) {
 		bonesCB.bones[i] = XMMatrixTranspose(boneList[i].finalTransform);
 		//bonesCB.bones[i] = boneList[i].finalTransform;
 	}
