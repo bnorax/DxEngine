@@ -1,13 +1,13 @@
 #pragma once
 #include <directXmath.h>
-#include "ModelLoader.h"
+#include "Model.h"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include "core/Time.h"
 
 
-class ModLoader;
+class Model;
 
 	struct SimpleVertex {
 		DirectX::XMFLOAT3 pos;

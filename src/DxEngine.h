@@ -5,7 +5,7 @@
 #include "render/InitDevice.h"
 #include "render/DeltaTime.h"
 #include "render/Mesh.h"
-#include "render/ModelLoader.h"
+#include "render/Model.h"
 #include "render/FrameStats.h"
 
 

@@ -1,7 +1,7 @@
 #define no_init_all deprecated
 
 #include "dxpch.h"
-#include "render/ModelLoader.h"
+#include "render/Model.h"
 
 //d3d11
 #include <DirectXmath.h>
@@ -50,7 +50,7 @@ HWND g_hWnd;
 //}
 
 
-void Render(ImGuiIO &io, DxEngine::EditorCamera &camera, std::vector<Mesh> &allObjects, ModelLoader &loader) {
+void Render(ImGuiIO &io, DxEngine::EditorCamera &camera, std::vector<Mesh> &allObjects, Model &loader, DxEngine::FrameStat frameStats) {
 	//imgui
 
 	g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, DirectX::Colors::Black);
@@ -149,11 +149,6 @@ void Render(ImGuiIO &io, DxEngine::EditorCamera &camera, std::vector<Mesh> &allO
 	//	}
 	//	g_pd3dDeviceContext->DrawIndexed((UINT)allObjects[i].indices.size(), 0, 0);
 	//}
-	
-	g_pSwapChain->Present(1, 0);
-}
-
-void RenderUI(DxEngine::FrameStat frameStats) {
 	spriteBatch->Begin();
 	spriteFont->DrawString(spriteBatch.get(), std::to_string(frameStats.GetFps()).c_str(), DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0, DirectX::XMFLOAT2(0, 0), 1);
 	spriteBatch->End();
@@ -175,8 +170,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	//Camera
 	DxEngine::EditorCamera camera(&mainWindow.hWnd);
 
-	ModelLoader loader;
-	loader.Load(mainWindow.hWnd, g_pd3dDevice, g_pd3dDeviceContext, std::string("C:\\Engine\\DxEngine\\resources\\mesh\\miku.glb"));
+	Model loader;
+	loader.Load(mainWindow.hWnd, g_pd3dDevice, g_pd3dDeviceContext, std::string("C:\\Engine\\DxEngine\\resources\\mesh\\fox.glb"));
 	//loader.Load(mainWindow.hWnd, g_pd3dDevice, g_pd3dDeviceContext, std::string("C:\\Engine\\DxEngine\\resources\\mesh\\b.glb"));
 	std::vector<Mesh> allObjects;
 	Mesh *temp = nullptr;
@@ -253,9 +248,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 		else {
 			frameStat.StatBegin();
-			Render(io, camera, allObjects, loader);
+			Render(io, camera, allObjects, loader, frameStat);
 			frameStat.StatEnd();
-			RenderUI(frameStat);
 		}
 	}
 
