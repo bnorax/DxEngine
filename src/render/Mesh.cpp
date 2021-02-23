@@ -8,52 +8,12 @@ Mesh::Mesh()
 {
 }
 
-Mesh::Mesh(aiScene *ascene, DirectX::XMMATRIX glTransform, ID3D11Device *dev, const std::vector<SimpleVertex> vert, const std::vector<UINT> ind, const std::vector<Texture>& tex, const std::map<std::string, UINT> boneM, const std::vector<Bone> boneL) :
-		vertices(vert),
-		indices(ind),
-		textures(tex),
-		device(dev),
-		boneList(boneL),
-		boneMap(boneM),
-		scene(ascene),
-		globalInverseTransform(glTransform)
-{
-	HRESULT hr;
-	D3D11_BUFFER_DESC vbd;
-	vbd.Usage = D3D11_USAGE_IMMUTABLE;
-	vbd.ByteWidth = static_cast<UINT>(sizeof(SimpleVertex) * vertices.size());
-	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vbd.CPUAccessFlags = 0;
-	vbd.MiscFlags = 0;
-
-	D3D11_SUBRESOURCE_DATA initData;
-	initData.pSysMem = &vertices[0];
-
-	hr = dev->CreateBuffer(&vbd, &initData, vertexBuffer.GetAddressOf());
-	if (FAILED(hr)) {
-		throw std::runtime_error("Failed to create vertex buffer.");
-	}
-
-	D3D11_BUFFER_DESC ibd;
-	ibd.Usage = D3D11_USAGE_IMMUTABLE;
-	ibd.ByteWidth = static_cast<UINT>(sizeof(UINT) * indices.size());
-	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	ibd.CPUAccessFlags = 0;
-	ibd.MiscFlags = 0;
-
-	initData.pSysMem = &indices[0];
-	hr = dev->CreateBuffer(&ibd, &initData, indexBuffer.GetAddressOf());
-	if (FAILED(hr)) {
-		throw std::runtime_error("Failed to create index buffer.");
-	}
-}
-
 void Mesh::MeshInit()
 {
 	HRESULT hr;
 	D3D11_BUFFER_DESC vbd;
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
-	vbd.ByteWidth = static_cast<UINT>(sizeof(SimpleVertex) * vertices.size());
+	vbd.ByteWidth = static_cast<UINT>(sizeof(Vertex) * vertices.size());
 	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vbd.CPUAccessFlags = 0;
 	vbd.MiscFlags = 0;
@@ -262,7 +222,7 @@ const aiNodeAnim* Mesh::FindNodeAnim(const aiAnimation* pAnimation, const std::s
 
 void Mesh::Draw(ID3D11DeviceContext *devcon) {
 	Time &time = Time::Instance();
-	UINT stride = sizeof(SimpleVertex);
+	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
 	devcon->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
 	devcon->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
@@ -280,7 +240,7 @@ void Mesh::Draw(ID3D11DeviceContext *devcon) {
 	cb.mProjection = XMMatrixTranspose(g_Projection);
 	g_pd3dDeviceContext->UpdateSubresource(g_pConstantBuffer, 0, nullptr, &cb, 0, 0);
 	g_pd3dDeviceContext->UpdateSubresource(g_pConstantBufferBones, 0, nullptr, &bonesCB, 0, 0);
-	devcon->DrawIndexed(static_cast<UINT>(indices.size()), 0, 0);
+	devcon->DrawIndexed(indices.size(), 0, 0);
 }
 
 //void Mesh::LoadTexture(const wchar_t* filename, ID3D11Device* device) {

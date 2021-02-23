@@ -32,7 +32,7 @@ void InitVertexBuffer(std::vector<Mesh>& allObjects) {
 		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 		
 		size_t count = allObjects[i].vertices.size();
-		bufferDesc.ByteWidth = count * sizeof(SimpleVertex);
+		bufferDesc.ByteWidth = count * sizeof(Vertex);
 
 		D3D11_SUBRESOURCE_DATA InitData;
 		InitData.pSysMem = &allObjects[i].vertices[0];
@@ -48,7 +48,7 @@ void UpdateVertexBuffer(ID3D11Buffer* vb, Mesh newMesh) {
 	ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
 	g_pd3dDeviceContext->Map(vb, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	//  Update the vertex buffer here.
-	memcpy(mappedResource.pData, newMesh.vertices.data() , newMesh.vertices.size()*sizeof(SimpleVertex));
+	memcpy(mappedResource.pData, newMesh.vertices.data() , newMesh.vertices.size()*sizeof(Vertex));
 	//  Reenable GPU access to the vertex buffer data.
 	g_pd3dDeviceContext->Unmap(vb, 0);
 }
@@ -101,7 +101,7 @@ void InitDepthBuf() {
 	depthBuf.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	depthBuf.MipLevels = 1;
 	depthBuf.ArraySize = 1;
-	depthBuf.SampleDesc.Count = 1;
+	depthBuf.SampleDesc.Count = 4;
 	depthBuf.SampleDesc.Quality = 0;
 	depthBuf.Usage = D3D11_USAGE_DEFAULT;
 	depthBuf.BindFlags = D3D11_BIND_DEPTH_STENCIL;

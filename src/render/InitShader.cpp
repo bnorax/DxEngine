@@ -11,8 +11,8 @@ ID3D11PixelShader* pixel_wave_ptr = NULL;
 
 void InitShader() {
 	ID3DBlob *vs_blob_ptr = NULL, *ps_blob_ptr = NULL, *ps_nt_blob_ptr = NULL, *ps_wave_blob_ptr = NULL, *vs_wave = NULL , *errorMessages = nullptr;;
-	const wchar_t* vs =  L"resources/shader/VertexTriangle.hlsl";
-	const wchar_t* ps = L"resources/shader/PixelTriangle.hlsl";
+	const wchar_t* vs =  L"resources/shader/VertexShader.hlsl";
+	const wchar_t* ps = L"resources/shader/PixelShader.hlsl";
 	// load and compile the two shaders
 	D3DCompileFromFile(
 		vs,

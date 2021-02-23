@@ -53,7 +53,7 @@ HWND g_hWnd;
 void Render(ImGuiIO &io, DxEngine::EditorCamera &camera, std::vector<Mesh> &allObjects, Model &loader, DxEngine::FrameStat frameStats) {
 	//imgui
 
-	g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, DirectX::Colors::DarkGray);
+	g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, DirectX::Colors::DarkSlateGray);
 	g_pd3dDeviceContext->ClearDepthStencilView(g_depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	static float t = 0.0f;
 	static ULONGLONG timeStart = 0;
@@ -105,7 +105,7 @@ void Render(ImGuiIO &io, DxEngine::EditorCamera &camera, std::vector<Mesh> &allO
 	g_pd3dDeviceContext->PSSetSamplers(1, 1, &g_SamplerState);
 	g_pd3dDeviceContext->IASetInputLayout(input_layout_ptr);
 	g_pd3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	loader.Draw(g_pd3dDeviceContext);
+	loader.draw(g_pd3dDeviceContext);	
 
 
 	//g_pd3dDeviceContext->RSSetState(g_rastState);
@@ -171,54 +171,12 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	DxEngine::EditorCamera camera(&mainWindow.hWnd);
 
 	Model loader;
-	loader.Load(mainWindow.hWnd, g_pd3dDevice, g_pd3dDeviceContext, std::string("C:\\Engine\\DxEngine\\resources\\mesh\\fox.glb"));
-	//loader.Load(mainWindow.hWnd, g_pd3dDevice, g_pd3dDeviceContext, std::string("C:\\Engine\\DxEngine\\resources\\mesh\\b.glb"));
+	loader.load(mainWindow.hWnd, g_pd3dDevice, g_pd3dDeviceContext, std::string("C:\\Engine\\DxEngine\\resources\\mesh\\dragon.glb"));
+
 	std::vector<Mesh> allObjects;
 	Mesh *temp = nullptr;
 	HRESULT hr;
-	//hr = ReadObjFromFile("resources/mesh/c1.obj", &temp);
-	/*if (hr == S_OK) {
-		DirectX::CreateWICTextureFromFile(g_pd3dDevice, L"desk.png", nullptr, temp->texture.get());
-		allObjects.push_back(*temp);
-	}*/
 
-//	hr = RedObjFromFileAssimp("resources/mesh/SchoolDesk.fbx", &temp);
-	//MyMesh gen;
-	//meshGen(&gen);
-	//allObjects.push_back(gen);
-
-	/*hr = ReadObjFromFile("c1.obj", &temp);
-	if (hr == S_OK) {
-		allObjects.push_back(*temp);
-		DirectX::CreateWICTextureFromFile(g_pd3dDevice, L"c1.png", nullptr, &allObjects.back().Texture);
-
-	}*/
-	/*skybox = new MyMesh;
-	hr = ReadObjFromFile("skybox.obj", &skybox);
-	if (hr == S_OK) {
-		DirectX::CreateWICTextureFromFile(g_pd3dDevice, L"skybox.png", nullptr, &skybox->Texture);
-	}
-*/
-
-//hr = ReadObjFromFile("scope.obj", &temp);
-//if (hr == S_OK) {
-//	/*for (int i = 0; i < temp->verts.size(); i++) {
-//		temp->verts[i].color.x = (float)rand() / ((float)RAND_MAX + 1);
-//		temp->verts[i].color.y = (float)rand() / ((float)RAND_MAX + 1);
-//		temp->verts[i].color.z = (float)rand() / ((float)RAND_MAX + 1);
-//	}*/\
-	//	DirectX::CreateWICTextureFromFile(g_pd3dDevice, L"scope.png", nullptr, &temp->Texture);
-	//	temp->staticMesh = true;
-	//	allObjects.push_back(*temp);
-	//}
-
-	//hr = RedObjFromFileAssimp("resources/mesh/wave.obj", &temp);
-
-	//hr = ReadObjFromFile("resources/mesh/wave.obj", &temp);
-	//allObjects.push_back(*temp);
-
-	//InitVertexBuffer(allObjects);
-	//InitIndexBuffer(allObjects);
 	InitDepthBuf();
 	InitConstantBuffer(allObjects);
 	InitShader();

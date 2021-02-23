@@ -31,69 +31,7 @@ void CleanupDeviceD3D()
 	if (g_pd3dDevice) { g_pd3dDevice->Release(); g_pd3dDevice = NULL; }
 }
 
-//void InitBuf() {
-//	HRESULT hr;
-//	WORD indices[] =
-//    {
-//        3,1,0,
-//        2,1,3,
-//
-//        0,5,4,
-//        1,5,0,
-//
-//        3,4,7,
-//        0,4,3,
-//
-//        1,6,5,
-//        2,6,1,
-//
-//        2,7,6,
-//        3,7,2,
-//
-//        6,4,5,
-//        7,4,6,
-//    };
-//
-//	D3D11_BUFFER_DESC bdi;
-//	ZeroMemory(&bdi, sizeof(bdi));
-//	bdi.Usage = D3D11_USAGE_DEFAULT;
-//	bdi.ByteWidth = sizeof(WORD) * 36;        // 36 vertices needed for 12 triangles in a triangle list
-//	bdi.BindFlags = D3D11_BIND_INDEX_BUFFER;
-//	bdi.CPUAccessFlags = 0;
-//	bdi.MiscFlags = 0;
-//
-//	D3D11_SUBRESOURCE_DATA IData;
-//	ZeroMemory(&IData, sizeof(IData));
-//	IData.pSysMem = indices;
-//	g_pd3dDevice->CreateBuffer(&bdi, &IData, &m_pIndexBuffer);
-//	g_pd3dDeviceContext->IASetIndexBuffer( m_pIndexBuffer, DXGI_FORMAT_R16_UINT, 0 );
-//	g_pd3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-//
-//	D3D11_BUFFER_DESC bd = {};
-//	bd.Usage = D3D11_USAGE_DEFAULT;
-//	bd.ByteWidth = sizeof(SimpleVertex) * 8;
-//	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-//	bd.CPUAccessFlags = 0;
-//
-//	D3D11_SUBRESOURCE_DATA InitData = {};
-//	InitData.pSysMem = vertices;
-//	g_pd3dDevice->CreateBuffer(&bd, &InitData, &g_pVertexBuffer);
-//	UINT stride = sizeof(SimpleVertex);
-//	UINT offset = 0;
-//	g_pd3dDeviceContext->IASetVertexBuffers(0, 1, &g_pVertexBuffer, &stride, &offset);
-//
-//	bd.Usage = D3D11_USAGE_DEFAULT;
-//	bd.ByteWidth = sizeof(ConstantBuffer);
-//	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-//	bd.CPUAccessFlags = 0;
-//	hr = g_pd3dDevice->CreateBuffer(&bd, nullptr, &g_pConstantBuffer);
-//	g_World = XMMatrixIdentity();
-//	XMVECTOR Eye = XMVectorSet(0.0f, 1.0f, -5.0f, 0.0f);
-//	XMVECTOR At = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-//	XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-//	g_View = XMMatrixLookAtLH(Eye, At, Up);
-//	g_Projection = XMMatrixPerspectiveFovLH(XM_PIDIV2, 1280 / (FLOAT)720, 0.01f, 100.0f);
-//}
+
 
 int InitDevice(HWND hWnd) {
 	DXGI_SWAP_CHAIN_DESC sd;
@@ -107,7 +45,7 @@ int InitDevice(HWND hWnd) {
 	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	sd.OutputWindow = hWnd;
-	sd.SampleDesc.Count = 1;
+	sd.SampleDesc.Count = 4;
 	sd.SampleDesc.Quality = 0;
 	sd.Windowed = TRUE;
 	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;

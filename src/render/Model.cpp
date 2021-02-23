@@ -1,6 +1,5 @@
 #include <dxpch.h>
 #include "Model.h"
-#include "InitBuff.h"
 
 Model::Model()
 {
@@ -11,7 +10,7 @@ Model::~Model()
 	scene->~aiScene();
 }
 
-bool Model::Load(HWND hwnd, ID3D11Device * device, ID3D11DeviceContext * devCon, std::string filename)
+bool Model::load(HWND pHwnd, ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, std::string filename)
 {
 	Assimp::Importer importer;
 	importer.ReadFile(filename,
@@ -24,18 +23,19 @@ bool Model::Load(HWND hwnd, ID3D11Device * device, ID3D11DeviceContext * devCon,
 		aiProcess_ConvertToLeftHanded);
 	aiScene* sceneI = importer.GetOrphanedScene();
 	if (sceneI == nullptr) return false;
-	this->globalInverseTransform = aiToXMMATRIX(sceneI->mRootNode->mTransformation);
-	this->scene = sceneI;
-	this->filepath = filename.substr(0, filename.find_last_of("/\\"));
-	this->device = device;
-	this->devCon = devCon;
-	this->hwnd = hwnd;
+	globalInverseTransform = aiToXMMATRIX(sceneI->mRootNode->mTransformation);
+	scene = sceneI;
+	filePath = filename.substr(0, filename.find_last_of("/\\"));
+	device = pDevice;
+	devCon = pDeviceContext;
+	hwnd = pHwnd;
+
 	processNode(scene->mRootNode, scene);
 
 	return true;
 }
 
-void Model::Draw(ID3D11DeviceContext * devCon)
+void Model::draw(ID3D11DeviceContext * devCon)
 {
 	for (size_t i = 0; i < meshes.size(); ++i) {
 		meshes[i].Draw(devCon);
@@ -70,7 +70,7 @@ DirectX::XMMATRIX aiToXMMATRIX(const aiMatrix3x3& AssimpMatrix) //делаем из aiMa
 	return m;
 }
 
-void AddBoneData(SimpleVertex &vert, UINT boneID, float weight) {
+void AddBoneData(Vertex &vert, UINT boneID, float weight) {
 		if (vert.boneWeights.x == 0.0) {
 			vert.boneIDs.x = boneID;
 			vert.boneWeights.x = weight;
@@ -109,16 +109,10 @@ Mesh Model::processMesh(aiMesh * mesh, aiScene * scene)
 	//std::map<std::string, UINT> boneMap;
 	//std::vector<Bone> boneList;
 
-	if (mesh->mMaterialIndex >= 0) {
-		aiMaterial* mat = scene->mMaterials[mesh->mMaterialIndex];
-
-		if (texType.empty()) {
-			texType = determineTextureType(scene, mat);
-		}
-	}
+	
 
 	for (UINT i = 0; i < mesh->mNumVertices; i++) {
-		SimpleVertex vertex;
+		Vertex vertex;
 
 		vertex.pos.x = mesh->mVertices[i].x;
 		vertex.pos.y = mesh->mVertices[i].y;
@@ -146,8 +140,8 @@ Mesh Model::processMesh(aiMesh * mesh, aiScene * scene)
 
 	if (mesh->HasBones()) {
 		this->numBones = 0;
-		for (UINT i = 0; i < mesh->mNumBones; i++) {
-			UINT boneIndex = 0;
+		for (unsigned int i = 0; i < mesh->mNumBones; i++) {
+			unsigned int boneIndex = 0;
 			std::string boneName(mesh->mBones[i]->mName.data);
 			if (curMesh.boneMap.find(boneName) == curMesh.boneMap.end()) {
 				boneIndex = numBones;
@@ -163,20 +157,22 @@ Mesh Model::processMesh(aiMesh * mesh, aiScene * scene)
 			curMesh.boneMap[boneName] = boneIndex;
 			curMesh.boneList[boneIndex].offsetMat = aiToXMMATRIX(mesh->mBones[i]->mOffsetMatrix);
 
-			for (UINT j = 0; j < mesh->mBones[i]->mNumWeights; j++) {
-				UINT vertID = mesh->mBones[i]->mWeights[j].mVertexId;
+			for (unsigned int j = 0; j < mesh->mBones[i]->mNumWeights; j++) {
+				unsigned int vertID = mesh->mBones[i]->mWeights[j].mVertexId;
 				float weight = mesh->mBones[i]->mWeights[j].mWeight;
 				AddBoneData(curMesh.vertices[vertID], boneIndex, weight);
 			}
 		}
 	}
-	 
-	
+
 	if (mesh->mMaterialIndex >= 0) {
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-		std::vector<Texture> diffuseMaps = this->loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse", scene);
+		std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse", scene);
 		curMesh.textures.insert(curMesh.textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+		std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_NORMALS, "texture_normal", scene);
+		curMesh.textures.insert(curMesh.textures.end(), normalMaps.begin(), normalMaps.end());
+		
 	}
 	curMesh.MeshInit();
 	return curMesh;
@@ -198,13 +194,13 @@ void Model::processNode(aiNode * node, aiScene * scene)
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial * mat, aiTextureType type, std::string typeName,  aiScene * scene)
 {
 	std::vector<Texture> textures;
-	for (UINT i = 0; i < mat->GetTextureCount(type); i++) {
-		aiString str;
-		mat->GetTexture(type, i, &str);
+	for (unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
+		aiString texture_file;
+		mat->GetTexture(type, i, &texture_file);
 		// Check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
 		bool skip = false;
-		for (UINT j = 0; j < loadedTextures.size(); j++) {
-			if (std::strcmp(loadedTextures[j].path.c_str(), str.C_Str()) == 0) {
+		for (unsigned int j = 0; j < loadedTextures.size(); j++) {
+			if (std::strcmp(loadedTextures[j].path.c_str(), texture_file.C_Str()) == 0) {
 				textures.push_back(loadedTextures[j]);
 				skip = true; // A texture with the same filepath has already been loaded, continue to next one. (optimization)
 				break;
@@ -213,49 +209,28 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial * mat, aiTextureType
 		if (!skip) {   // If texture hasn't been loaded already, load it
 			HRESULT hr;
 			Texture texture;
-			if (texType == "embedded compressed texture") {
-				int textureindex = getTextureIndex(&str);
-				//ComPtr<ID3D11ShaderResourceView> tex = getTextureFromModel(scene, textureindex);
-				getTextureFromModel(scene, texture.texture.GetAddressOf(), textureindex);
-				//hr = DirectX::CreateWICTextureFromMemory(device, devCon, sizeof(tex), );
-				//hr = DirectX::CreateWICTextureFromFile(device, devCon, filenamews.c_str(), nullptr, texture.texture.GetAddressOf());
+			if (auto texType = scene->GetEmbeddedTexture(texture_file.C_Str())) {
+				int textureIndex = getTextureIndex(&texture_file);
+				hr = DirectX::CreateWICTextureFromMemory(device, devCon, (const uint8_t*)(scene->mTextures[textureIndex]->pcData), scene->mTextures[textureIndex]->mWidth, nullptr, texture.texture.GetAddressOf());
+				if (FAILED(hr))
+					MessageBox(hwnd, L"Texture couldn't be created from memory!", L"Error!", MB_ICONERROR | MB_OK);
 				
 			}
 			else {
-				std::string filename = std::string(str.C_Str());
-				filename = filepath + '/' + filename;
+				std::string filename = std::string(texture_file.C_Str());
+				filename = filePath + '/' + filename;
 				std::wstring filenamews = std::wstring(filename.begin(), filename.end());
 				hr = DirectX::CreateWICTextureFromFile(device, devCon, filenamews.c_str(), nullptr, texture.texture.GetAddressOf());
 				if (FAILED(hr))
 					MessageBox(hwnd, L"Texture couldn't be loaded", L"Error!", MB_ICONERROR | MB_OK);
 			}
 			texture.type = typeName;
-			texture.path = str.C_Str();
+			texture.path = texture_file.C_Str();
 			textures.push_back(texture);
-			this->loadedTextures.push_back(texture);  // Store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
+			loadedTextures.push_back(texture);  // Store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
 		}
 	}
 	return textures;
-}
-
-std::string Model::determineTextureType(const aiScene * scene, aiMaterial * mat)
-{
-	aiString textypeStr;
-	mat->GetTexture(aiTextureType_DIFFUSE, 0, &textypeStr);
-	std::string textypeteststr = textypeStr.C_Str();
-	if (textypeteststr == "*0" || textypeteststr == "*1" || textypeteststr == "*2" || textypeteststr == "*3" || textypeteststr == "*4" || textypeteststr == "*5") {
-		if (scene->mTextures[0]->mHeight == 0) {
-			return "embedded compressed texture";
-		}
-		else {
-			return "embedded non-compressed texture";
-		}
-	}
-	if (textypeteststr.find('.') != std::string::npos) {
-		return "textures are on disk";
-	}
-
-	return ".";
 }
 
 int Model::getTextureIndex(aiString * str)
@@ -264,14 +239,4 @@ int Model::getTextureIndex(aiString * str)
 	tistr = str->C_Str();
 	tistr = tistr.substr(1);
 	return stoi(tistr);
-}
-
-void Model::getTextureFromModel(const aiScene * scene, ID3D11ShaderResourceView **texView, int textureIndex)
-{
-	HRESULT hr;
-	hr = DirectX::CreateWICTextureFromMemory(device, devCon, (const uint8_t*)(scene->mTextures[textureIndex]->pcData), scene->mTextures[textureIndex]->mWidth, nullptr, texView);
-	//int* size = reinterpret_cast<int*>(&scene->mTextures[textureIndex]->mWidth);
-	//hr = DirectX::CreateWICTextureFromMemory(device, devCon, reinterpret_cast<unsigned char*>(scene->mTextures[textureIndex]->pcData), *size, nullptr, texView);
-	if (FAILED(hr))
-		MessageBox(hwnd, L"Texture couldn't be created from memory!", L"Error!", MB_ICONERROR | MB_OK);
 }
