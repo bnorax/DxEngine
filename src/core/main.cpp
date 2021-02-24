@@ -152,7 +152,7 @@ void Render(ImGuiIO &io, DxEngine::EditorCamera &camera, std::vector<Mesh> &allO
 	spriteBatch->Begin();
 	spriteFont->DrawString(spriteBatch.get(), std::to_string(frameStats.GetFps()).c_str(), DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0, DirectX::XMFLOAT2(0, 0), 1);
 	spriteBatch->End();
-	g_pSwapChain->Present(1, 0);
+	g_pSwapChain->Present(0, 0);
 }
 
 
@@ -171,7 +171,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	DxEngine::EditorCamera camera(&mainWindow.hWnd);
 
 	Model loader;
-	loader.load(mainWindow.hWnd, g_pd3dDevice, g_pd3dDeviceContext, std::string("C:\\Engine\\DxEngine\\resources\\mesh\\dragon.glb"));
+	loader.load(mainWindow.hWnd, g_pd3dDevice, g_pd3dDeviceContext, std::string("C:\\Engine\\DxEngine\\resources\\mesh\\miku.glb"));
 
 	std::vector<Mesh> allObjects;
 	Mesh *temp = nullptr;
