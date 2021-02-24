@@ -37,7 +37,7 @@ struct ConstantBuffer {
 };
 
 struct BonesCB {
-	XMMATRIX bones[200];
+	XMMATRIX bones[500];
 };
 
 void InitSamplerState();

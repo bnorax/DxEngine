@@ -57,7 +57,7 @@ DirectX::XMMATRIX aiToXMMATRIX(const aiMatrix4x4& AssimpMatrix) //делаем из aiMa
 	return m;
 }
 
-DirectX::XMMATRIX aiToXMMATRIX(const aiMatrix3x3& AssimpMatrix) //делаем из aiMatrix(assimp) -> матрицу из директа(XMfloat4x4)
+DirectX::XMMATRIX aiToXMMATRIX(const aiMatrix3x3& AssimpMatrix) //делаем из aiMatrix(assimp) -> матрицу из директа(XMfloat3x3)
 {
 	DirectX::XMMATRIX m;
 	m = DirectX::XMMatrixIdentity();
@@ -103,17 +103,9 @@ Mesh Model::processMesh(aiMesh * mesh, aiScene * scene)
 	curMesh.globalInverseTransform = this->globalInverseTransform;
 	curMesh.device = device;
 	curMesh.scene = scene;
-	//std::vector<SimpleVertex> vertices;
-	//std::vector<UINT> indices;
-	//std::vector<Texture> textures;
-	//std::map<std::string, UINT> boneMap;
-	//std::vector<Bone> boneList;
 
-	
-
-	for (UINT i = 0; i < mesh->mNumVertices; i++) {
+	for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
 		Vertex vertex;
-
 		vertex.pos.x = mesh->mVertices[i].x;
 		vertex.pos.y = mesh->mVertices[i].y;
 		vertex.pos.z = mesh->mVertices[i].z;
@@ -130,10 +122,10 @@ Mesh Model::processMesh(aiMesh * mesh, aiScene * scene)
 		curMesh.vertices.push_back(vertex);
 	}
 
-	for (UINT i = 0; i < mesh->mNumFaces; i++) {
+	for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
 		aiFace face = mesh->mFaces[i];
 
-		for (UINT j = 0; j < face.mNumIndices; j++)
+		for (unsigned int j = 0; j < face.mNumIndices; j++)
 			curMesh.indices.push_back(face.mIndices[j]);
 	}
 
@@ -170,8 +162,8 @@ Mesh Model::processMesh(aiMesh * mesh, aiScene * scene)
 
 		std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse", scene);
 		curMesh.textures.insert(curMesh.textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-		std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_NORMALS, "texture_normal", scene);
-		curMesh.textures.insert(curMesh.textures.end(), normalMaps.begin(), normalMaps.end());
+		//std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_NORMALS, "texture_normal", scene);
+		//curMesh.textures.insert(curMesh.textures.end(), normalMaps.begin(), normalMaps.end());
 		
 	}
 	curMesh.MeshInit();
@@ -180,12 +172,12 @@ Mesh Model::processMesh(aiMesh * mesh, aiScene * scene)
 
 void Model::processNode(aiNode * node, aiScene * scene)
 {
-	for (UINT i = 0; i < node->mNumMeshes; i++) {
+	for (unsigned int i = 0; i < node->mNumMeshes; i++) {
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 		meshes.push_back(this->processMesh(mesh, scene));
 	}
 
-	for (UINT i = 0; i < node->mNumChildren; i++) {
+	for (unsigned int i = 0; i < node->mNumChildren; i++) {
 		this->processNode(node->mChildren[i], scene);
 	}
 }

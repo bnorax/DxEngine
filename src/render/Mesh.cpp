@@ -46,7 +46,7 @@ void Mesh::BoneTransform(float timeInSeconds)
 	float TicksPerSecond = scene->mAnimations[0]->mTicksPerSecond != 0 ?
 		scene->mAnimations[0]->mTicksPerSecond : 25.0f;
 	float TimeInTicks = timeInSeconds * TicksPerSecond;
-	float AnimationTime = fmod(TimeInTicks, scene->mAnimations[0]->mDuration);
+	float AnimationTime = fmod(TimeInTicks, (float)scene->mAnimations[0]->mDuration);
 	//float AnimationTime = scene->mAnimations[0]->mDuration / scene->mAnimations[0]->mTicksPerSecond;
 	ReadNodeHeirarchy(AnimationTime, scene->mRootNode, fullBoneTransform);
 
@@ -110,7 +110,7 @@ void Mesh::CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const 
 	assert(NextPositionIndex < pNodeAnim->mNumPositionKeys);
 	float DeltaTime = (float)(pNodeAnim->mPositionKeys[NextPositionIndex].mTime - pNodeAnim->mPositionKeys[PositionIndex].mTime);
 	float Factor = (AnimationTime - (float)pNodeAnim->mPositionKeys[PositionIndex].mTime) / DeltaTime;
-	//assert(Factor >= 0.0f && Factor <= 1.0f);
+	assert(Factor >= 0.0f && Factor <= 1.0f);
 	const aiVector3D& Start = pNodeAnim->mPositionKeys[PositionIndex].mValue;
 	const aiVector3D& End = pNodeAnim->mPositionKeys[NextPositionIndex].mValue;
 	aiVector3D Delta = End - Start;
@@ -131,7 +131,7 @@ void Mesh::CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, cons
 	assert(NextRotationIndex < pNodeAnim->mNumRotationKeys);
 	float DeltaTime = (float)(pNodeAnim->mRotationKeys[NextRotationIndex].mTime - pNodeAnim->mRotationKeys[RotationIndex].mTime);
 	float Factor = (AnimationTime - (float)pNodeAnim->mRotationKeys[RotationIndex].mTime) / DeltaTime;
-	//assert(Factor >= 0.0f && Factor <= 1.0f);
+	assert(Factor >= 0.0f && Factor <= 1.0f);
 	const aiQuaternion& StartRotationQ = pNodeAnim->mRotationKeys[RotationIndex].mValue;
 	const aiQuaternion& EndRotationQ = pNodeAnim->mRotationKeys[NextRotationIndex].mValue;
 	aiQuaternion::Interpolate(Out, StartRotationQ, EndRotationQ, Factor);
@@ -151,7 +151,7 @@ void Mesh::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const a
 	assert(NextScalingIndex < pNodeAnim->mNumScalingKeys);
 	float DeltaTime = (float)(pNodeAnim->mScalingKeys[NextScalingIndex].mTime - pNodeAnim->mScalingKeys[ScalingIndex].mTime);
 	float Factor = (AnimationTime - (float)pNodeAnim->mScalingKeys[ScalingIndex].mTime) / DeltaTime;
-	//assert(Factor >= 0.0f && Factor <= 1.0f); 
+	assert(Factor >= 0.0f && Factor <= 1.0f); 
 	const aiVector3D& Start = pNodeAnim->mScalingKeys[ScalingIndex].mValue;
 	const aiVector3D& End = pNodeAnim->mScalingKeys[NextScalingIndex].mValue;
 	aiVector3D Delta = End - Start;
@@ -226,12 +226,13 @@ void Mesh::Draw(ID3D11DeviceContext *devcon) {
 	UINT offset = 0;
 	devcon->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
 	devcon->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+	if(!textures.empty())
 	devcon->PSSetShaderResources(1, 1, textures[0].texture.GetAddressOf());
 	ConstantBuffer cb;
 	BonesCB bonesCB;
 	float a = (float)time.GetTimeInMillisSinceAppStart();
 	BoneTransform(a / 1000);
-	for (UINT i = 0; i < boneList.size() && i<200; i++) {
+	for (UINT i = 0; i < boneList.size() && i<500; i++) {
 		bonesCB.bones[i] = XMMatrixTranspose(boneList[i].finalTransform);
 		//bonesCB.bones[i] = boneList[i].finalTransform;
 	}
