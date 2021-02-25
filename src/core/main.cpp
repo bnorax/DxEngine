@@ -171,7 +171,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	DxEngine::EditorCamera camera(&mainWindow.hWnd);
 
 	Model loader;
-	loader.load(mainWindow.hWnd, g_pd3dDevice, g_pd3dDeviceContext, std::string("C:\\Engine\\DxEngine\\resources\\mesh\\cyber.glb"));
+	loader.load(mainWindow.hWnd, g_pd3dDevice, g_pd3dDeviceContext, std::string("C:\\Engine\\DxEngine\\resources\\mesh\\miku.glb"));
 
 	std::vector<Mesh> allObjects;
 	Mesh *temp = nullptr;
