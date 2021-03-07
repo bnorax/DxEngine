@@ -23,25 +23,25 @@ XMMATRIX g_Projection;
 
 
 
-void InitVertexBuffer(std::vector<Mesh>& allObjects) {
-	for (int i = 0; i < allObjects.size(); i++) {
-		ID3D11Buffer* newBuf;
-		D3D11_BUFFER_DESC bufferDesc = {};
-		bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-		
-		size_t count = allObjects[i].vertices.size();
-		bufferDesc.ByteWidth = count * sizeof(Vertex);
-
-		D3D11_SUBRESOURCE_DATA InitData;
-		InitData.pSysMem = &allObjects[i].vertices[0];
-		InitData.SysMemPitch = 0;
-		InitData.SysMemSlicePitch = 0;
-		g_pd3dDevice->CreateBuffer(&bufferDesc, &InitData, &newBuf);
-		g_VBA.push_back(newBuf);
-	}
-}
+//void InitVertexBuffer(std::vector<Mesh>& allObjects) {
+//	for (int i = 0; i < allObjects.size(); i++) {
+//		ID3D11Buffer* newBuf;
+//		D3D11_BUFFER_DESC bufferDesc = {};
+//		bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+//		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+//		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+//		
+//		size_t count = allObjects[i].vertices.size();
+//		bufferDesc.ByteWidth = count * sizeof(Vertex);
+//
+//		D3D11_SUBRESOURCE_DATA InitData;
+//		InitData.pSysMem = &allObjects[i].vertices[0];
+//		InitData.SysMemPitch = 0;
+//		InitData.SysMemSlicePitch = 0;
+//		g_pd3dDevice->CreateBuffer(&bufferDesc, &InitData, &newBuf);
+//		g_VBA.push_back(newBuf);
+//	}
+//}
 
 void UpdateVertexBuffer(ID3D11Buffer* vb, Mesh newMesh) {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -52,22 +52,22 @@ void UpdateVertexBuffer(ID3D11Buffer* vb, Mesh newMesh) {
 	//  Reenable GPU access to the vertex buffer data.
 	g_pd3dDeviceContext->Unmap(vb, 0);
 }
-
-void InitIndexBuffer(std::vector<Mesh>& allObjects) {
-	for (int i = 0; i < allObjects.size(); i++) {
-		ID3D11Buffer* newBuf;
-		D3D11_BUFFER_DESC bd = {};
-		bd.Usage = D3D11_USAGE_DEFAULT;
-		bd.ByteWidth = (UINT)sizeof(WORD) * allObjects.at(i).indices.size();        // 36 vertices needed for 12 triangles in a triangle list
-		bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-		bd.CPUAccessFlags = 0;
-		D3D11_SUBRESOURCE_DATA InitData;
-		InitData.pSysMem = &allObjects.at(i).indices[0];
-		HRESULT HR = g_pd3dDevice->CreateBuffer(&bd, &InitData, &newBuf);
-		g_pd3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		g_IBA.push_back(newBuf);
-	}
-}
+//
+//void InitIndexBuffer(std::vector<Mesh>& allObjects) {
+//	for (int i = 0; i < allObjects.size(); i++) {
+//		ID3D11Buffer* newBuf;
+//		D3D11_BUFFER_DESC bd = {};
+//		bd.Usage = D3D11_USAGE_DEFAULT;
+//		bd.ByteWidth = (UINT)sizeof(WORD) * allObjects.at(i).indices.size();        // 36 vertices needed for 12 triangles in a triangle list
+//		bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+//		bd.CPUAccessFlags = 0;
+//		D3D11_SUBRESOURCE_DATA InitData;
+//		InitData.pSysMem = &allObjects.at(i).indices[0];
+//		HRESULT HR = g_pd3dDevice->CreateBuffer(&bd, &InitData, &newBuf);
+//		g_pd3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+//		g_IBA.push_back(newBuf);
+//	}
+//}
 
 void InitConstantBuffer(std::vector<Mesh>& allObjects) {
 	D3D11_BUFFER_DESC bd = {};

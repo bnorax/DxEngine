@@ -50,7 +50,7 @@ HWND g_hWnd;
 //}
 
 
-void Render(ImGuiIO &io, DxEngine::EditorCamera &camera, std::vector<Mesh> &allObjects, Model &loader, DxEngine::FrameStat frameStats) {
+void Render(DxEngine::Render &render, ImGuiIO &io, DxEngine::EditorCamera &camera, std::vector<Mesh> &allObjects, Model &loader, DxEngine::FrameStat frameStats) {
 	//imgui
 
 	g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, DirectX::Colors::DarkSlateGray);
@@ -95,15 +95,18 @@ void Render(ImGuiIO &io, DxEngine::EditorCamera &camera, std::vector<Mesh> &allO
 	g_pd3dDeviceContext->OMSetBlendState(g_blendState, blendFactor, 0xffffffff);
 	g_pd3dDeviceContext->OMSetDepthStencilState(g_depthStencilState, 0);
 
-	g_pd3dDeviceContext->VSSetShader(vertex_shader_ptr, nullptr, 0);
-	// g_pd3dDeviceContext->VSSetShader(vertex_shader_ptr, nullptr, 0);
-	g_pd3dDeviceContext->VSSetConstantBuffers(1, 1, &g_pConstantBuffer);
-	g_pd3dDeviceContext->PSSetConstantBuffers(1, 1, &g_pConstantBuffer);
 
-	g_pd3dDeviceContext->PSSetShader(pixel_shader_ptr, nullptr, 0);
-	//g_pd3dDeviceContext->PSSetShader(pixel_nt_shader_ptr, nullptr, 0);
+	auto vs = render.vertexShaders.at(L"VertexShader");
+	g_pd3dDeviceContext->VSSetShader(vs.vsPtr.Get(), nullptr, 0);
+	g_pd3dDeviceContext->VSSetConstantBuffers(1, 1, &g_pConstantBuffer);
+	// g_pd3dDeviceContext->VSSetShader(vertex_shader_ptr, nullptr, 0);
+	auto ps = render.pixelShaders.at(L"textured");
+	g_pd3dDeviceContext->PSSetShader(ps.psPtr.Get(), nullptr, 0);
+	g_pd3dDeviceContext->PSSetConstantBuffers(1, 1, &g_pConstantBuffer);
 	g_pd3dDeviceContext->PSSetSamplers(1, 1, &g_SamplerState);
-	g_pd3dDeviceContext->IASetInputLayout(input_layout_ptr);
+
+	//g_pd3dDeviceContext->PSSetShader(pixel_nt_shader_ptr, nullptr, 0);
+	g_pd3dDeviceContext->IASetInputLayout(render.input_layout_ptr.Get());
 	g_pd3dDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	loader.draw(g_pd3dDeviceContext);	
 
@@ -167,6 +170,13 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	UpdateWindow(mainWindow.hWnd);
 	InitDevice(mainWindow.hWnd);
 
+	DxEngine::Render mainRender;
+	mainRender.device = g_pd3dDevice;
+	mainRender.devCon = g_pd3dDeviceContext;
+	mainRender.loadShaders();
+
+	//InitDevice(mainWindow.hWnd);
+
 	//Camera
 	DxEngine::EditorCamera camera(&mainWindow.hWnd);
 
@@ -175,11 +185,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	std::vector<Mesh> allObjects;
 	Mesh *temp = nullptr;
-	HRESULT hr;
 
 	InitDepthBuf();
 	InitConstantBuffer(allObjects);
-	InitShader();
+	//InitShader();
 	InitSamplerState();
 
 	spriteBatch = std::make_unique<DirectX::SpriteBatch>(g_pd3dDeviceContext);
@@ -206,7 +215,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 		else {
 			frameStat.StatBegin();
-			Render(io, camera, allObjects, loader, frameStat);
+			Render(mainRender, io, camera, allObjects, loader, frameStat);
 			frameStat.StatEnd();
 		}
 	}

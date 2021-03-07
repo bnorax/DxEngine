@@ -1,19 +1,34 @@
 #pragma once
 #include <dxpch.h>
-#include <wrl/client.h>
+#include <d3dcompiler.h>
+#include <scene/Scene.h>
 
-class PixelShader{
+namespace DxEngine {
 
-};
+	class PixelShader {
+	public:
+		std::wstring path;
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> psPtr = nullptr;
+	};
 
-class VertexShader {
-	Microsoft::WRL::ComPtr<ID3D11VertexShader> vsPtr = nullptr;
+	class VertexShader {
+	public:
+		std::wstring path;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> vsPtr = nullptr;
 
-};
+	};
 
-class Render {
-public:
-	std::vector<VertexShader> vertexShaders;
-	std::vector<PixelShader> pixelShaders;
-private:
-};
+	class Render {
+	public:
+		void loadShaders();
+		DxEngine::Scene* loadScene();
+
+		std::map<std::wstring, VertexShader> vertexShaders;
+		std::map<std::wstring, PixelShader> pixelShaders;
+		Microsoft::WRL::ComPtr<ID3D11InputLayout> input_layout_ptr;
+		std::unique_ptr<DxEngine::Scene> *currentScene;
+		ID3D11Device *device;
+		ID3D11DeviceContext *devCon;
+	private:
+	};
+}

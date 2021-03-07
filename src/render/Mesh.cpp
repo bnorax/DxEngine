@@ -43,7 +43,7 @@ void Mesh::MeshInit()
 void Mesh::BoneTransform(float timeInSeconds)
 {
 	DirectX::XMMATRIX fullBoneTransform = XMMatrixIdentity();
-	float TicksPerSecond = scene->mAnimations[0]->mTicksPerSecond != 0 ?
+	float TicksPerSecond = (float)scene->mAnimations[0]->mTicksPerSecond != 0 ?
 		scene->mAnimations[0]->mTicksPerSecond : 25.0f;
 	float TimeInTicks = timeInSeconds * TicksPerSecond;
 	float AnimationTime = fmod(TimeInTicks, (float)scene->mAnimations[0]->mDuration);
