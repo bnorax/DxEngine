@@ -1,20 +1,21 @@
 #pragma once
 #include <directXmath.h>
 #include "Model.h"
+#include "render/InitBuff.h"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 #include "core/Time.h"
 
-
-class Model;
+namespace DxEngine {
+	class Model;
 
 	struct Vertex {
 		DirectX::XMFLOAT3 pos;
 		DirectX::XMFLOAT4 color;
 		DirectX::XMFLOAT2 texCoord;
 		DirectX::XMFLOAT3 normal;
-		DirectX::XMUINT4 boneIDs = {0, 0, 0, 0};
+		DirectX::XMUINT4 boneIDs = { 0, 0, 0, 0 };
 		DirectX::XMFLOAT4 boneWeights = { 0, 0, 0, 0 };
 	};
 
@@ -58,7 +59,8 @@ class Model;
 		aiScene *scene;;
 		DirectX::XMMATRIX globalInverseTransform;
 		ID3D11Device *device;
-		
+
 	private:
 		Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer, indexBuffer;
 	};
+}

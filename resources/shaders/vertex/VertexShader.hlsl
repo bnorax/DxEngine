@@ -44,7 +44,7 @@ PS_INPUT vs_main(VS_INPUT input)
    /* output.Pos = mul(input.Pos, World)*/;
     output.Pos = mul(output.Pos, View);
     output.Pos = mul(output.Pos, Projection);
-   // output.Pos = mul(BoneTransform, vp);
+   //output.Pos = mul(BoneTransform, vp);
    
 	output.Color = input.Color;
 	output.Texcoord = input.Texcoord;

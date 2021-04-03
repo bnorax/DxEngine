@@ -1,11 +1,9 @@
 #pragma once
 //Render headers
 #include "render/InitBuff.h"
-#include "render/InitDevice.h"
 #include "render/DeltaTime.h"
 #include "render/Mesh.h"
 #include "render/Model.h"
-#include "render/FrameStats.h"
 #include "render/Render.h"
 
 
@@ -18,5 +16,4 @@
 
 //Controls
 #include <controls/Camera.h>
-
 

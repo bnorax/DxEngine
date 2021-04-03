@@ -1,19 +1,26 @@
 #pragma once
-
-class Time {
-public:
-	static Time& Instance() {
-		static Time s;
-		return s;
-	}
-	ULONGLONG GetTimeInMillisSinceAppStart() {
-
-		return (GetTickCount64()- startTick);
-	}
-private:
-	ULONGLONG startTick = GetTickCount64();
-	Time() {};
-	~Time() {};
-	Time(Time const&) = delete;
-	Time& operator= (Time const&) = delete;
-};
+namespace DxEngine {
+	//all times in millies
+	class Time {
+	public:
+		static Time& Instance() {
+			static Time s;
+			return s;
+		}
+		float GetTimeSinceAppStart();
+		int GetFps();
+		void FrameBegin();
+		void FrameEnd();
+	private:
+		LARGE_INTEGER appStartTick, beginFrame, now, freq;
+		int frameCounter = 0, prevFrames = 0, prevFrameTime = 0, deltaTime = 0;
+		Time() {
+			QueryPerformanceFrequency(&freq);
+			freq.QuadPart /= 1000; //time in millis
+			QueryPerformanceCounter(&appStartTick);
+		};
+		~Time() {};
+		Time(Time const&) = delete;
+		Time& operator= (Time const&) = delete;
+	};
+}

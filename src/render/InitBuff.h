@@ -15,7 +15,7 @@ extern ID3D11Texture2D* g_depthBuffer;
 extern ID3D11DepthStencilView* g_depthStencil;
 extern ID3D11DepthStencilState* g_depthStencilState;
 extern ID3D11DepthStencilState* g_depthStencilStateOff;
-
+extern ID3D11BlendState* g_blendState;
 extern ID3D11Buffer* g_pVertexBuffer;
 extern ID3D11Buffer* g_pIndexBuffer;
 extern ID3D11Buffer* g_pConstantBuffer;

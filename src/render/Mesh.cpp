@@ -4,11 +4,11 @@
 #include <WICTextureLoader.h>
 
 
-Mesh::Mesh()
+DxEngine::Mesh::Mesh()
 {
 }
 
-void Mesh::MeshInit()
+void DxEngine::Mesh::MeshInit()
 {
 	HRESULT hr;
 	D3D11_BUFFER_DESC vbd;
@@ -40,9 +40,9 @@ void Mesh::MeshInit()
 	}
 }
 
-void Mesh::BoneTransform(float timeInSeconds)
+void DxEngine::Mesh::BoneTransform(float timeInSeconds)
 {
-	DirectX::XMMATRIX fullBoneTransform = XMMatrixIdentity();
+	DirectX::XMMATRIX fullBoneTransform = DirectX::XMMatrixIdentity();
 	float TicksPerSecond = (float)scene->mAnimations[0]->mTicksPerSecond != 0 ?
 		scene->mAnimations[0]->mTicksPerSecond : 25.0f;
 	float TimeInTicks = timeInSeconds * TicksPerSecond;
@@ -52,7 +52,7 @@ void Mesh::BoneTransform(float timeInSeconds)
 
 }
 
-UINT Mesh::FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim)
+UINT DxEngine::Mesh::FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim)
 {
 	for (UINT i = 0; i < pNodeAnim->mNumPositionKeys - 1; i++) {
 		if (AnimationTime < (float)pNodeAnim->mPositionKeys[i + 1].mTime) {
@@ -66,7 +66,7 @@ UINT Mesh::FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim)
 }
 
 
-UINT Mesh::FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim)
+UINT DxEngine::Mesh::FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim)
 {
 	assert(pNodeAnim->mNumRotationKeys > 0);
 
@@ -82,7 +82,7 @@ UINT Mesh::FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim)
 }
 
 
-UINT Mesh::FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim)
+UINT DxEngine::Mesh::FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim)
 {
 	assert(pNodeAnim->mNumScalingKeys > 0);
 
@@ -98,7 +98,7 @@ UINT Mesh::FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim)
 }
 
 
-void Mesh::CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim)
+void DxEngine::Mesh::CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim)
 {
 	if (pNodeAnim->mNumPositionKeys == 1) {
 		Out = pNodeAnim->mPositionKeys[0].mValue;
@@ -118,7 +118,7 @@ void Mesh::CalcInterpolatedPosition(aiVector3D& Out, float AnimationTime, const 
 }
 
 
-void Mesh::CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim)
+void DxEngine::Mesh::CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, const aiNodeAnim* pNodeAnim)
 {
 	// we need at least two values to interpolate...
 	if (pNodeAnim->mNumRotationKeys == 1) {
@@ -139,7 +139,7 @@ void Mesh::CalcInterpolatedRotation(aiQuaternion& Out, float AnimationTime, cons
 }
 
 
-void Mesh::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim)
+void DxEngine::Mesh::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeAnim* pNodeAnim)
 {
 	if (pNodeAnim->mNumScalingKeys == 1) {
 		Out = pNodeAnim->mScalingKeys[0].mValue;
@@ -159,12 +159,12 @@ void Mesh::CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const a
 }
 
 
-void Mesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const XMMATRIX& ParentTransform)
+void DxEngine::Mesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const DirectX::XMMATRIX& ParentTransform)
 {
 	std::string NodeName(pNode->mName.data);
 
 	const aiAnimation* pAnimation = scene->mAnimations[0];
-	XMMATRIX NodeTransformation = aiToXMMATRIX(pNode->mTransformation);
+	DirectX::XMMATRIX NodeTransformation = aiToXMMATRIX(pNode->mTransformation);
 	//aiNodeAnim* pNodeAnim = animMap->at(pNode->mName);
 	//const aiNodeAnim* pNodeAnim = paretnModel.animMap.find(NodeName);
 	const aiNodeAnim* pNodeAnim = FindNodeAnim(pAnimation, NodeName);
@@ -191,7 +191,7 @@ void Mesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const XMM
 		//NodeTransformation = DirectX::XMMatrixTranspose(NodeTransformation);
 	}
 
-	XMMATRIX GlobalTransformation =   NodeTransformation * ParentTransform;
+	DirectX::XMMATRIX GlobalTransformation =   NodeTransformation * ParentTransform;
 	//XMMATRIX GlobalTransformation =ParentTransform* NodeTransformation ;
 
 	if (boneMap.find(NodeName) != boneMap.end()) {
@@ -206,7 +206,7 @@ void Mesh::ReadNodeHeirarchy(float AnimationTime, const aiNode* pNode, const XMM
 }
 
 
-const aiNodeAnim* Mesh::FindNodeAnim(const aiAnimation* pAnimation, const std::string NodeName)
+const aiNodeAnim* DxEngine::Mesh::FindNodeAnim(const aiAnimation* pAnimation, const std::string NodeName)
 {
 	for (UINT i = 0; i < pAnimation->mNumChannels; i++) {
 		const aiNodeAnim* pNodeAnim = pAnimation->mChannels[i];
@@ -220,8 +220,9 @@ const aiNodeAnim* Mesh::FindNodeAnim(const aiAnimation* pAnimation, const std::s
 }
 
 
-void Mesh::Draw(ID3D11DeviceContext *devcon) {
-	Time &time = Time::Instance();
+void DxEngine::Mesh::Draw(ID3D11DeviceContext *devcon) {
+
+	DxEngine::Time &time = DxEngine::Time::Instance();
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
 	devcon->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
@@ -230,7 +231,7 @@ void Mesh::Draw(ID3D11DeviceContext *devcon) {
 	devcon->PSSetShaderResources(1, 1, textures[0].texture.GetAddressOf());
 	ConstantBuffer cb;
 	BonesCB bonesCB;
-	float a = (float)time.GetTimeInMillisSinceAppStart();
+	float a = (float)time.GetTimeSinceAppStart();
 	BoneTransform(a / 1000);
 	for (UINT i = 0; i < boneList.size() && i<500; i++) {
 		bonesCB.bones[i] = XMMatrixTranspose(boneList[i].finalTransform);
@@ -239,8 +240,8 @@ void Mesh::Draw(ID3D11DeviceContext *devcon) {
 	cb.mWorld = XMMatrixTranspose(g_World);
 	cb.mView = XMMatrixTranspose(g_View);
 	cb.mProjection = XMMatrixTranspose(g_Projection);
-	g_pd3dDeviceContext->UpdateSubresource(g_pConstantBuffer, 0, nullptr, &cb, 0, 0);
-	g_pd3dDeviceContext->UpdateSubresource(g_pConstantBufferBones, 0, nullptr, &bonesCB, 0, 0);
+	devcon->UpdateSubresource(g_pConstantBuffer, 0, nullptr, &cb, 0, 0);
+	devcon->UpdateSubresource(g_pConstantBufferBones, 0, nullptr, &bonesCB, 0, 0);
 	devcon->DrawIndexed(indices.size(), 0, 0);
 }
 

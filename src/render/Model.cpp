@@ -1,16 +1,16 @@
 #include <dxpch.h>
 #include "Model.h"
 
-Model::Model()
+DxEngine::Model::Model()
 {
 }
 
-Model::~Model()
+DxEngine::Model::~Model()
 {
 	scene->~aiScene();
 }
 
-bool Model::load(HWND pHwnd, ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, std::string filename)
+bool DxEngine::Model::load(HWND pHwnd, ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContext, std::string filename)
 {
 	Assimp::Importer importer;
 	importer.ReadFile(filename,
@@ -23,7 +23,7 @@ bool Model::load(HWND pHwnd, ID3D11Device * pDevice, ID3D11DeviceContext * pDevi
 		aiProcess_ConvertToLeftHanded);
 	aiScene* sceneI = importer.GetOrphanedScene();
 	if (sceneI == nullptr) return false;
-	globalInverseTransform = aiToXMMATRIX(sceneI->mRootNode->mTransformation);
+	globalInverseTransform = DxEngine::aiToXMMATRIX(sceneI->mRootNode->mTransformation);
 	scene = sceneI;
 	filePath = filename.substr(0, filename.find_last_of("/\\"));
 	device = pDevice;
@@ -35,16 +35,17 @@ bool Model::load(HWND pHwnd, ID3D11Device * pDevice, ID3D11DeviceContext * pDevi
 	return true;
 }
 
-void Model::draw(ID3D11DeviceContext * devCon)
+void DxEngine::Model::draw(ID3D11DeviceContext * devCon)
 {
 	for (size_t i = 0; i < meshes.size(); ++i) {
+		
 		meshes[i].Draw(devCon);
 	}
 }
 
 std::string texType;
 
-DirectX::XMMATRIX aiToXMMATRIX(const aiMatrix4x4& AssimpMatrix) //делаем из aiMatrix(assimp) -> матрицу из директа(XMfloat4x4)
+DirectX::XMMATRIX DxEngine::aiToXMMATRIX(const aiMatrix4x4& AssimpMatrix) //делаем из aiMatrix(assimp) -> матрицу из директа(XMfloat4x4)
 {
 	DirectX::XMMATRIX m;
 	m = DirectX::XMMatrixIdentity();
@@ -57,7 +58,7 @@ DirectX::XMMATRIX aiToXMMATRIX(const aiMatrix4x4& AssimpMatrix) //делаем из aiMa
 	return m;
 }
 
-DirectX::XMMATRIX aiToXMMATRIX(const aiMatrix3x3& AssimpMatrix) //делаем из aiMatrix(assimp) -> матрицу из директа(XMfloat3x3)
+DirectX::XMMATRIX DxEngine::aiToXMMATRIX(const aiMatrix3x3& AssimpMatrix) //делаем из aiMatrix(assimp) -> матрицу из директа(XMfloat3x3)
 {
 	DirectX::XMMATRIX m;
 	m = DirectX::XMMatrixIdentity();
@@ -70,7 +71,7 @@ DirectX::XMMATRIX aiToXMMATRIX(const aiMatrix3x3& AssimpMatrix) //делаем из aiMa
 	return m;
 }
 
-void AddBoneData(Vertex &vert, UINT boneID, float weight) {
+void AddBoneData(DxEngine::Vertex &vert, UINT boneID, float weight) {
 		if (vert.boneWeights.x == 0.0) {
 			vert.boneIDs.x = boneID;
 			vert.boneWeights.x = weight;
@@ -95,7 +96,7 @@ void AddBoneData(Vertex &vert, UINT boneID, float weight) {
 
 
 
-Mesh Model::processMesh(aiMesh * mesh, aiScene * scene)
+DxEngine::Mesh DxEngine::Model::processMesh(aiMesh * mesh, aiScene * scene)
 {
 	Mesh *curMeshP;
 	curMeshP = new Mesh;
@@ -147,7 +148,7 @@ Mesh Model::processMesh(aiMesh * mesh, aiScene * scene)
 				boneIndex = curMesh.boneMap[boneName];
 			}
 			curMesh.boneMap[boneName] = boneIndex;
-			curMesh.boneList[boneIndex].offsetMat = aiToXMMATRIX(mesh->mBones[i]->mOffsetMatrix);
+			curMesh.boneList[boneIndex].offsetMat = DxEngine::aiToXMMATRIX(mesh->mBones[i]->mOffsetMatrix);
 
 			for (unsigned int j = 0; j < mesh->mBones[i]->mNumWeights; j++) {
 				unsigned int vertID = mesh->mBones[i]->mWeights[j].mVertexId;
@@ -170,7 +171,7 @@ Mesh Model::processMesh(aiMesh * mesh, aiScene * scene)
 	return curMesh;
 }
 
-void Model::processNode(aiNode * node, aiScene * scene)
+void DxEngine::Model::processNode(aiNode * node, aiScene * scene)
 {
 	for (unsigned int i = 0; i < node->mNumMeshes; i++) {
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
@@ -183,7 +184,7 @@ void Model::processNode(aiNode * node, aiScene * scene)
 }
 
 
-std::vector<Texture> Model::loadMaterialTextures(aiMaterial * mat, aiTextureType type, std::string typeName,  aiScene * scene)
+std::vector<DxEngine::Texture> DxEngine::Model::loadMaterialTextures(aiMaterial * mat, aiTextureType type, std::string typeName,  aiScene * scene)
 {
 	std::vector<Texture> textures;
 	for (unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
@@ -225,7 +226,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial * mat, aiTextureType
 	return textures;
 }
 
-int Model::getTextureIndex(aiString * str)
+int DxEngine::Model::getTextureIndex(aiString * str)
 {
 	std::string tistr;
 	tistr = str->C_Str();

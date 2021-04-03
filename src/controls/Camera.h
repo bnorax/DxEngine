@@ -3,11 +3,11 @@
 namespace DxEngine {
 	class EditorCamera {
 		POINT prevPoint, curPoint;
-		HWND* currentWindowHandler;
+		HWND currentWindowHandler;
 	public:
 		void EditorCameraUpdate();
 
-		EditorCamera(HWND* windowHandler) {
+		EditorCamera(HWND windowHandler) {
 			currentWindowHandler = windowHandler;
 		}
 	};

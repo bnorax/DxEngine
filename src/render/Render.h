@@ -1,9 +1,18 @@
 #pragma once
 #include <dxpch.h>
 #include <d3dcompiler.h>
-#include <scene/Scene.h>
+//d3d11
+#include <DirectXmath.h>
+#include <DirectXColors.h>
+#include "core/InitWindow.h"
+#include "render/InitBuff.h"
+//#include <scene/Scene.h>
 
+class Model;
 namespace DxEngine {
+	class EditorCamera;
+	class Time;
+	class OSWindow;
 
 	class PixelShader {
 	public:
@@ -20,15 +29,32 @@ namespace DxEngine {
 
 	class Render {
 	public:
-		void loadShaders();
-		DxEngine::Scene* loadScene();
-
+		Render(OSWindow&);
+		void LoadShaders();
+		//void SetScene(SceneNS::Scene &scene) {
+		//	currentScene = std::make_shared<SceneNS::Scene>(scene);
+		//};
+		void RenderFrame(ImGuiIO&, EditorCamera&, Time&);
 		std::map<std::wstring, VertexShader> vertexShaders;
 		std::map<std::wstring, PixelShader> pixelShaders;
+		OSWindow &windowRef;
 		Microsoft::WRL::ComPtr<ID3D11InputLayout> input_layout_ptr;
-		std::unique_ptr<DxEngine::Scene> *currentScene;
-		ID3D11Device *device;
-		ID3D11DeviceContext *devCon;
+		//std::shared_ptr<SceneNS::Scene> currentScene;
+		Microsoft::WRL::ComPtr<ID3D11Device> device;
+		Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext;	
+	protected:
+		Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain;
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> mainRenderTargetView;
+		Model *model;
+		void loadModel();
+		
 	private:
+		void CreateConstantBuffer();
+		void CreateDepthBuffer();
+		void CreateSamplerState();
+		void CreateBlendState();
+		void CreateSwapChain();
+		void CreateRenderTarget();
+		void CreateViewport();
 	};
 }

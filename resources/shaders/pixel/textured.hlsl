@@ -8,7 +8,6 @@ cbuffer ConstantBuffer : register(b1)
     float time;
 };
 
-
 Texture2D Tex : register(t1);
 SamplerState Samp : register(s1);
 

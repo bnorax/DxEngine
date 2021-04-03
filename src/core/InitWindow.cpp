@@ -10,8 +10,8 @@ int DxEngine::OSWindow::InitWindow() {
 		wcex.lpfnWndProc = WndProc,
 		wcex.cbClsExtra = 0,
 		wcex.cbWndExtra = 0,
-		wcex.hInstance = hInst,
-		wcex.hIcon = LoadIcon(hInst, IDI_APPLICATION),
+		wcex.hInstance = NULL,
+		wcex.hIcon = LoadIcon(NULL, IDI_APPLICATION),
 		wcex.hCursor = LoadCursor(NULL, IDC_ARROW),
 		wcex.hbrBackground = NULL,
 		wcex.lpszMenuName = NULL,
@@ -27,9 +27,9 @@ int DxEngine::OSWindow::InitWindow() {
 
 		return 1;
 	}
-	RECT clientArea = {0, 0, wndWidth, wndHeight};
+	RECT clientArea = {0, 0, width, height};
 	AdjustWindowRect(&clientArea, WS_OVERLAPPEDWINDOW, FALSE);
-	hWnd = CreateWindow(szWindowClass, szWindowName, WS_OVERLAPPEDWINDOW, 0, 0, clientArea.right - clientArea.left, clientArea.bottom - clientArea.top, NULL, NULL, hInst, NULL);
+	hWnd = CreateWindow(szWindowClass, szWindowName, WS_OVERLAPPEDWINDOW, 0, 0, clientArea.right - clientArea.left, clientArea.bottom - clientArea.top, NULL, NULL, NULL, NULL);
 	int a = GetLastError();
 	if (!hWnd)
 	{

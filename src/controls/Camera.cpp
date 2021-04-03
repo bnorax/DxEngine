@@ -7,7 +7,7 @@ void DxEngine::EditorCamera::EditorCameraUpdate()
 	float a = 1;
 	if (GetAsyncKeyState(VK_RBUTTON) < 0) {
 		GetCursorPos(&curPoint);
-		ScreenToClient(*currentWindowHandler, &curPoint);
+		ScreenToClient(currentWindowHandler, &curPoint);
 		if (&curPoint || &prevPoint != NULL) {
 			if (curPoint.y - prevPoint.y > 1) {
 				g_View *= XMMatrixRotationX(-0.01f);
@@ -39,5 +39,5 @@ void DxEngine::EditorCamera::EditorCameraUpdate()
 		g_View *= XMMatrixTranslation(0.01f*a, 0, 0);
 	}
 	GetCursorPos(&prevPoint);
-	ScreenToClient(*currentWindowHandler, &prevPoint);
+	ScreenToClient(currentWindowHandler, &prevPoint);
 }
