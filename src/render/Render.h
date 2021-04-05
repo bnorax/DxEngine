@@ -6,6 +6,7 @@
 #include <DirectXColors.h>
 #include "core/InitWindow.h"
 #include "render/InitBuff.h"
+#include "render/ShaderLibrary.h"
 //#include <scene/Scene.h>
 
 class Model;
@@ -14,29 +15,13 @@ namespace DxEngine {
 	class Time;
 	class OSWindow;
 
-	class PixelShader {
-	public:
-		std::wstring path;
-		Microsoft::WRL::ComPtr<ID3D11PixelShader> psPtr = nullptr;
-	};
-
-	class VertexShader {
-	public:
-		std::wstring path;
-		Microsoft::WRL::ComPtr<ID3D11VertexShader> vsPtr = nullptr;
-
-	};
-
 	class Render {
 	public:
 		Render(OSWindow&);
-		void LoadShaders();
 		//void SetScene(SceneNS::Scene &scene) {
 		//	currentScene = std::make_shared<SceneNS::Scene>(scene);
 		//};
 		void RenderFrame(ImGuiIO&, EditorCamera&, Time&);
-		std::map<std::wstring, VertexShader> vertexShaders;
-		std::map<std::wstring, PixelShader> pixelShaders;
 		OSWindow &windowRef;
 		Microsoft::WRL::ComPtr<ID3D11InputLayout> input_layout_ptr;
 		//std::shared_ptr<SceneNS::Scene> currentScene;
@@ -56,5 +41,6 @@ namespace DxEngine {
 		void CreateSwapChain();
 		void CreateRenderTarget();
 		void CreateViewport();
+		std::unique_ptr<ShaderLibrary> shaderLibrary(Render&);
 	};
 }

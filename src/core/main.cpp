@@ -51,9 +51,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	ImGui_ImplDX11_Init(mainRender.device.Get(), mainRender.deviceContext.Get());
 	MSG msg = {};
 	ZeroMemory(&msg, sizeof(msg));
-
-
-	//frames stat
 	while (WM_QUIT != msg.message)
 	{
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
@@ -64,7 +61,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 		else {
 			timeSingl.FrameBegin();
-			//Render(mainRender, io, camera, allObjects, loader, timeSingl);
 			mainRender.RenderFrame(io, camera, timeSingl);
 			timeSingl.FrameEnd();
 		}
