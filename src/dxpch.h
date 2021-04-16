@@ -11,6 +11,7 @@
 #include <windows.h>
 #include <tchar.h>
 #include <string>
+#include <array>
 #include <vector>
 #include <map>
 #include <math.h>

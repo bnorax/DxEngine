@@ -1,4 +1,6 @@
 #pragma once
+#include <dxpch.h>
+#include <DirectXMath.h>
 
 namespace DxEngine {
 	class EditorCamera {

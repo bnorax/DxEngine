@@ -1,25 +1,31 @@
 #pragma once
 #include <dxpch.h>
-#include "DxEngine.h"
+#include "entt/entt.hpp"
+//#include "scene/Components.h"
+//#include "scene/systems/RenderSystem.h"
+//#include "scene/systems/CameraSystem.h"
 
-class Model;
+//class Model;
 
 namespace DxEngine {
+	class Renderer;
 	namespace SceneNS {
 		class Scene {
 		public:
-			Scene() {};
+			//Scene(Renderer& pRenderer) : renderer(pRenderer){};
+			Scene() = default;
 			std::string name;
-			//std::vector<Model> models;
-			/*std::vector<Camera> cameras;
-			std::vector<LightSource> lightSources;*/
+			entt::registry registry;
+		private:
+			//Renderer& renderer;
 		};
+
 		class SceneLoader {
 		public:
 			SceneLoader(std::shared_ptr<Scene> pScene) : scene(pScene) {};
 			SceneLoader() {};
 			std::shared_ptr<Scene> loadFromFile(std::wstring path);
-			bool saveToFile(std::shared_ptr<Scene> scene);
+			bool SaveToFile(std::shared_ptr<Scene> scene);
 		private:
 			std::shared_ptr<Scene> scene;
 		};

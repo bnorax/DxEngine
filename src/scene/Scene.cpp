@@ -1,8 +1,10 @@
 #include "Scene.h"
 
+class CameraSystem;
+
 namespace DxEngine {
 	namespace SceneNS {
-		bool SceneLoader::saveToFile(std::shared_ptr<Scene> scene)
+		bool SceneLoader::SaveToFile(std::shared_ptr<Scene> scene)
 		{
 			return false;
 		}

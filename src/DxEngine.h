@@ -1,10 +1,10 @@
 #pragma once
 //Render headers
-#include "render/InitBuff.h"
-#include "render/DeltaTime.h"
-#include "render/Mesh.h"
-#include "render/Model.h"
-#include "render/Render.h"
+//#include "render/InitBuff.h"
+//#include "render/DeltaTime.h"
+//#include "render/Mesh.h"
+//#include "render/Model.h"
+#include "renderer/Renderer.h"
 
 
 //Scene headers

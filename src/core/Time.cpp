@@ -3,7 +3,7 @@
 float DxEngine::Time::GetTimeSinceAppStart()
 {
 	QueryPerformanceCounter(&now);
-	return (now.QuadPart - appStartTick.QuadPart) / freq.QuadPart;
+	return static_cast<float>(now.QuadPart - appStartTick.QuadPart) / freq.QuadPart;
 }
 
 int DxEngine::Time::GetFps()
@@ -20,7 +20,7 @@ void DxEngine::Time::FrameEnd()
 {
 	frameCounter++;
 	QueryPerformanceCounter(&now);
-	prevFrameTime = (now.QuadPart - beginFrame.QuadPart) / freq.QuadPart;
+	prevFrameTime = static_cast<int>((now.QuadPart - beginFrame.QuadPart) / freq.QuadPart);
 	deltaTime += prevFrameTime;
 	if (deltaTime >= 1000) {
 		prevFrames = frameCounter;

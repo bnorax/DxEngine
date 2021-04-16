@@ -1,13 +1,16 @@
-cbuffer ConstantBuffer : register(b1)
+cbuffer cbPerRender : register(b0)
 {
-	matrix World;
 	matrix View;
 	matrix Projection;
 	float4 colorLight;
 	float3 directionLight;
 	float time;
 };
-cbuffer bones : register(b2)
+cbuffer cbPerObject : register(b1)
+{
+	matrix World;
+};
+cbuffer cbBones : register(b2)
 {
     matrix bones[500];
 }
@@ -36,12 +39,12 @@ struct VS_INPUT
 PS_INPUT vs_main(VS_INPUT input)
 {
 	PS_INPUT output;
-    matrix BoneTransform = bones[input.boneIds[0]] * input.boneWiegth[0];
-    BoneTransform += bones[input.boneIds[1]] * input.boneWiegth[1];
-    BoneTransform += bones[input.boneIds[2]] * input.boneWiegth[2];
-    BoneTransform += bones[input.boneIds[3]] * input.boneWiegth[3];
-    output.Pos = mul(input.Pos, BoneTransform);
-   /* output.Pos = mul(input.Pos, World)*/;
+   // matrix BoneTransform = bones[input.boneIds[0]] * input.boneWiegth[0];
+    //BoneTransform += bones[input.boneIds[1]] * input.boneWiegth[1];
+   //// BoneTransform += bones[input.boneIds[2]] * input.boneWiegth[2];
+    //BoneTransform += bones[input.boneIds[3]] * input.boneWiegth[3];
+   // output.Pos = mul(input.Pos, BoneTransform);
+    output.Pos = mul(input.Pos, World);
     output.Pos = mul(output.Pos, View);
     output.Pos = mul(output.Pos, Projection);
    //output.Pos = mul(BoneTransform, vp);

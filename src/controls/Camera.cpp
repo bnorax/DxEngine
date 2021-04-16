@@ -1,6 +1,6 @@
-#include <dxpch.h>
 #include "Camera.h"
-#include "render/InitBuff.h"
+
+using namespace DirectX;
 
 void DxEngine::EditorCamera::EditorCameraUpdate()
 {

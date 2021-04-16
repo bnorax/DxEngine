@@ -1,7 +1,4 @@
-#define no_init_all deprecated
-
 #include "dxpch.h"
-#include "render/Model.h"
 
 //d3d11
 #include <DirectXmath.h>
@@ -30,25 +27,17 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	auto &timeSingl =  DxEngine::Time::Instance();
-	std::unique_ptr<DxEngine::OSWindow> mainWindow = std::make_unique<DxEngine::OSWindow>(1920, 1080, _T("DxEngine App"));
+	std::unique_ptr<DxEngine::Window> mainWindow = std::make_unique<DxEngine::Window>(1920, 1080, _T("DxEngine App"));
 	mainWindow->InitWindow();
 	ShowWindow(mainWindow->hWnd, SW_SHOWDEFAULT);
 	UpdateWindow(mainWindow->hWnd);
 
-	DxEngine::Render mainRender(*mainWindow);
-	mainRender.LoadShaders();
+	DxEngine::Renderer mainRender(*mainWindow);
 	//Camera
-	DxEngine::EditorCamera camera(mainWindow->hWnd);
 
 	//spriteBatch = std::make_unique<DirectX::SpriteBatch>(g_pd3dDeviceContext);
 	//spriteFont = std::make_unique<DirectX::SpriteFont>(g_pd3dDevice, L"resources/font/myfile.spritefont");
 
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	ImGui::StyleColorsDark();
-	ImGui_ImplWin32_Init(mainWindow->hWnd);
-	ImGui_ImplDX11_Init(mainRender.device.Get(), mainRender.deviceContext.Get());
 	MSG msg = {};
 	ZeroMemory(&msg, sizeof(msg));
 	while (WM_QUIT != msg.message)
@@ -61,7 +50,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 		else {
 			timeSingl.FrameBegin();
-			mainRender.RenderFrame(io, camera, timeSingl);
+			mainRender.RenderFrame();
 			timeSingl.FrameEnd();
 		}
 	}

@@ -1,13 +1,3 @@
-cbuffer ConstantBuffer : register(b1)
-{
-    matrix World;
-    matrix View;
-    matrix Projection;
-    float4 colorLight;
-    float3 directionLight;
-    float time;
-};
-
 Texture2D Tex : register(t1);
 SamplerState Samp : register(s1);
 
