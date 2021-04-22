@@ -1,12 +1,7 @@
 #include "Renderer.h"
+#include <DirectXColors.h>
 
 namespace sfs = std::filesystem;
-
-void DxEngine::Renderer::loadModel()
-{
-	//model = std::make_unique<Model>();
-	//bool hey = model->load(windowRef.hWnd, device.Get(), deviceContext.Get(), std::string("C:\\Engine\\DxEngine\\resources\\mesh\\miku.glb"));
-}
 
 void DxEngine::Renderer::CreateConstantBuffers()
 {
@@ -31,6 +26,31 @@ void DxEngine::Renderer::CreateConstantBuffers()
 	bd2.CPUAccessFlags = 0;
 	HR = device->CreateBuffer(&bd2, nullptr, renderStates->constantBufferBones.GetAddressOf());
 
+	D3D11_BUFFER_DESC bd3 = {};
+	bd3.Usage = D3D11_USAGE_DEFAULT;
+	bd3.ByteWidth = sizeof(ConstantBufferPerFrame);
+	bd3.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	bd3.CPUAccessFlags = 0;
+	HR = device->CreateBuffer(&bd3, nullptr, renderStates->cbPerFrame.GetAddressOf());
+}
+
+void DxEngine::Renderer::CreateBoxBuffers()
+{
+	HRESULT hr;
+	D3D11_BUFFER_DESC vbd;
+	vbd.Usage = D3D11_USAGE_IMMUTABLE;
+	vbd.ByteWidth = static_cast<UINT>(sizeof(Vertex) * primitives.box.vertices.size());
+	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vbd.CPUAccessFlags = 0;
+	vbd.MiscFlags = 0;
+
+	D3D11_SUBRESOURCE_DATA initData;
+	initData.pSysMem = &primitives.box.vertices[0];
+
+	hr = device->CreateBuffer(&vbd, &initData, primitives.box.vertexBuffer.GetAddressOf());
+	if (FAILED(hr)) {
+		throw std::runtime_error("Failed to create vertex buffer.");
+	}
 }
 
 void DxEngine::Renderer::CreateDepthBuffer()
@@ -164,14 +184,14 @@ void DxEngine::Renderer::CreateRasterizerState()
 	D3D11_RASTERIZER_DESC rasterizerState;
 	ZeroMemory(&rasterizerState, sizeof(D3D11_RASTERIZER_DESC));
 	rasterizerState.FillMode = D3D11_FILL_SOLID;
-	rasterizerState.CullMode = D3D11_CULL_FRONT;
+	rasterizerState.CullMode = D3D11_CULL_BACK;
 	device->CreateRasterizerState(&rasterizerState, renderStates->rasterizerState.GetAddressOf());
 
 	D3D11_RASTERIZER_DESC rasterizerState1;
 	ZeroMemory(&rasterizerState1, sizeof(D3D11_RASTERIZER_DESC));
 	rasterizerState1.FillMode = D3D11_FILL_SOLID;
 	rasterizerState1.CullMode = D3D11_CULL_NONE;
-	rasterizerState1.FrontCounterClockwise = true;
+
 	device->CreateRasterizerState(&rasterizerState1, renderStates->rasterizerState_nbf.GetAddressOf());
 }
 
@@ -199,32 +219,36 @@ DxEngine::Renderer::Renderer(Window &window) : windowRef(window)
 	deviceContext->VSSetConstantBuffers(0, 1, renderStates->cbPerRender.GetAddressOf());
 	deviceContext->VSSetConstantBuffers(1, 1, renderStates->cbPerObject.GetAddressOf());
 	deviceContext->VSSetConstantBuffers(2, 1, renderStates->constantBufferBones.GetAddressOf());
+	deviceContext->VSSetConstantBuffers(3, 1, renderStates->cbPerFrame.GetAddressOf());
 
-	ConstantBufferPerRender cb;
 	XMVECTOR Eye = XMVectorSet(0.0f, 2.0f, -5.0f, 0.0f);
 	XMVECTOR At = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-	cb.view = XMMatrixLookAtLH(Eye, At, Up);
-	cb.projection = XMMatrixPerspectiveFovLH(XM_PIDIV2, 1920 / (FLOAT)1080, 0.01f, 100.0f);
-	deviceContext->UpdateSubresource(renderStates->cbPerRender.Get(), 0, nullptr, &cb, 0, 0);
+	cbPerFrame.view = XMMatrixLookAtLH(Eye, At, Up);
+	cbPerRender.projection = XMMatrixPerspectiveFovLH(XM_PIDIV2, 1920 / (FLOAT)1080, 0.01f, 100.0f);
+
+	ConstantBufferPerRender rcb = cbPerRender;
+	rcb.projection = XMMatrixTranspose(rcb.projection);
+	ConstantBufferPerFrame cb = cbPerFrame;
+	cb.view = XMMatrixTranspose(cb.view);
+	deviceContext->UpdateSubresource(renderStates->cbPerRender.Get(), 0, nullptr, &rcb, 0, 0);
+	deviceContext->UpdateSubresource(renderStates->cbPerFrame.Get(), 0, nullptr, &cb, 0, 0);
 
 	CreateScene();
+
 	auto entity = currentScene->registry.create();
-	//currentScene->registry.emplace<SceneNS::Components::Renderable>(entity);
-
 	currentScene->registry.emplace<Camera>(entity);
-
-	/*currentScene->registry.emplace<SceneNS::Components::Model>(entity);
-	auto modelComp = currentScene->registry.get<SceneNS::Components::Model>(entity);
-	modelComp.filePath = "resources\\mesh\\fox.glb";
-	currentScene->registry.replace<SceneNS::Components::Model>(entity, modelComp);*/
-
+	currentScene->registry.emplace<Renderable>(entity);
+	currentScene->registry.emplace<Model>(entity, "resources\\mesh\\fox.glb");
+	BoxCollider collider;
+	collider.colliderBox.Center = { 0.0f,  0.0f, 0.0f };
+	collider.colliderBox.Extents = { 2.0f,  2.0f,  2.0f };
+	currentScene->registry.emplace<BoxCollider>(entity, collider);
 
 	auto skyboxEntity = currentScene->registry.create();
 	currentScene->registry.emplace<Renderable>(skyboxEntity);
 	currentScene->registry.emplace<Model>(skyboxEntity, std::string("resources\\mesh\\skybox.glb"));
 	currentScene->registry.emplace<Skybox>(skyboxEntity);
-	//currentScene->registry.emplace<
 
 	componentSystems = std::make_unique<SceneNS::Systems>(*this, *currentScene.get());
 	componentSystems->InitSystems();
@@ -254,9 +278,9 @@ DxEngine::Renderer::Renderer(Window &window) : windowRef(window)
 void DxEngine::Renderer::RenderFrame()
 {
 	componentSystems->UpdateFrame();
-	//imgui
 
 	swapChain->Present(0, 0);
+	//imgui
 
 //	deviceContext->ClearRenderTargetView(mainRenderTargetView.Get(), DirectX::Colors::DarkSlateGray);
 //	deviceContext->ClearDepthStencilView(g_depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);

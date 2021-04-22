@@ -1,5 +1,5 @@
-#include <dxpch.h>
 #include "SkyboxSystem.h"
+#include "renderer/Renderer.h"
 
 void DxEngine::SceneNS::SkyboxSystem::Load()
 {

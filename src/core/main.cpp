@@ -1,42 +1,23 @@
 #include "dxpch.h"
-
-//d3d11
-#include <DirectXmath.h>
-#include <DirectXColors.h>
-
 //dxengine
-#include <DxEngine.h>
-
-//directxtk
-#include <WICTextureLoader.h>
-#include <SpriteBatch.h>
-#include <SpriteFont.h>
+#include "core/InitWindow.h"
+#include "core/Time.h"
+#include "renderer/Renderer.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 //std::unique_ptr<DirectX::SpriteBatch> spriteBatch;
 //std::unique_ptr<DirectX::SpriteFont> spriteFont;
 
-//DirectX::XMFLOAT4 g_colorLight = { 1.0f, 1.0f, 1.0f, 1.0f };
-//DirectX::XMFLOAT3 g_directionLight = { -1.0f, 0 , 0.8f };
-
-//ID3D11BlendState* g_blds;
-//ID3D11ShaderResourceView* g_text_view = nullptr;
-
-
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	auto &timeSingl =  DxEngine::Time::Instance();
+	auto& timeSingl = DxEngine::Time::Instance();
 	std::unique_ptr<DxEngine::Window> mainWindow = std::make_unique<DxEngine::Window>(1920, 1080, _T("DxEngine App"));
 	mainWindow->InitWindow();
 	ShowWindow(mainWindow->hWnd, SW_SHOWDEFAULT);
 	UpdateWindow(mainWindow->hWnd);
 
 	DxEngine::Renderer mainRender(*mainWindow);
-	//Camera
-
-	//spriteBatch = std::make_unique<DirectX::SpriteBatch>(g_pd3dDeviceContext);
-	//spriteFont = std::make_unique<DirectX::SpriteFont>(g_pd3dDevice, L"resources/font/myfile.spritefont");
 
 	MSG msg = {};
 	ZeroMemory(&msg, sizeof(msg));
@@ -56,8 +37,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	}
 	return 0;
 }
-
-
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam)) return true;

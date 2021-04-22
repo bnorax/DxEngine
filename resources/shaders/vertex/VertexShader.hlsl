@@ -1,6 +1,5 @@
 cbuffer cbPerRender : register(b0)
 {
-	matrix View;
 	matrix Projection;
 	float4 colorLight;
 	float3 directionLight;
@@ -14,24 +13,28 @@ cbuffer cbBones : register(b2)
 {
     matrix bones[500];
 }
+cbuffer cbPerFrame : register(b3)
+{
+	matrix View;
+}
 //--------------------------------------------------------------------------------------
-struct PS_INPUT
-{
-	float4 Pos : SV_POSITION;
-	float4 Color : COLOR;
-	float2 Texcoord : TEXCOORD;
-	float3 Normal : NORMAL;
-};
+	struct PS_INPUT
+	{
+		float4 Pos : SV_POSITION;
+		float4 Color : COLOR;
+		float2 Texcoord : TEXCOORD;
+		float3 Normal : NORMAL;
+	};
 
-struct VS_INPUT
-{
-	float4 Pos : POSITION;
-	float4 Color : COLOR;
-	float2 Texcoord : TEXCOORD;
-	float3 Normal : NORMAL;
-    uint4 boneIds : BONEID;
-    float4 boneWiegth : BONEWEIGHT;
-};
+	struct VS_INPUT
+	{
+		float4 Pos : POSITION;
+		float4 Color : COLOR;
+		float2 Texcoord : TEXCOORD;
+		float3 Normal : NORMAL;
+		uint4 boneIds : BONEID;
+		float4 boneWiegth : BONEWEIGHT;
+	};
 
 //--------------------------------------------------------------------------------------
 // Vertex Shader

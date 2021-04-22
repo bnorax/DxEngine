@@ -1,9 +1,5 @@
 #pragma once
 //Render headers
-//#include "render/InitBuff.h"
-//#include "render/DeltaTime.h"
-//#include "render/Mesh.h"
-//#include "render/Model.h"
 #include "renderer/Renderer.h"
 
 

@@ -3,7 +3,6 @@
 namespace DxEngine {
 	class Renderer;
 	namespace SceneNS {
-		//class Model;
 		class RenderSystem {
 		public:
 			RenderSystem(Renderer& pRenderer) : renderer(pRenderer) {};

@@ -1,7 +1,9 @@
 #pragma once
+#include <dxpch.h>
 #include "scene/systems/ModelSystem.h"
 #include "scene/systems/RenderSystem.h"
 #include "scene/systems/CameraSystem.h"
+#include "scene/systems/BoxColliderSystem.h"
 
 namespace DxEngine {
 	class Renderer;
@@ -18,6 +20,7 @@ namespace DxEngine {
 			std::unique_ptr<RenderSystem> renderSystem;
 			std::unique_ptr<ModelSystem> modelSystem;
 			std::unique_ptr<CameraSystem> cameraSystem;
+			std::unique_ptr<BoxColliderSystem> boxColliderSystem;
 			void UpdateFrame();
 		private:
 			Renderer& renderer;

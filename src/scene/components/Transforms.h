@@ -1,14 +1,13 @@
 #pragma once
-#include <dxpch.h>
-
+#include <array>
+#include "renderer/GraphicObjects.h"
 namespace DxEngine {
 	namespace SceneNS::Components {
 		struct Transforms {
-			Transforms(std::array<float, 3> pPosition, std::array<float, 3> pRotation, std::array<float, 3> pScale) :
-				position(pPosition),
+			Transforms(std::array<float, 3> pRotation, std::array<float, 3> pScale) :
 				rotation(pRotation),
 				scale(pScale){};
-			std::array<float, 3> position;
+			position3f pos;
 			std::array<float, 3> rotation;
 			std::array<float, 3> scale;
 		};

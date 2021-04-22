@@ -1,5 +1,4 @@
 #pragma once
-
 namespace DxEngine {
 	class Window {
 	private:

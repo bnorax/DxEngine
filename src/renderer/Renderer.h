@@ -1,17 +1,11 @@
 #pragma once
-#include <dxpch.h>
-#include <d3dcompiler.h>
 //d3d11
-#include <DirectXmath.h>
-#include <DirectXColors.h>
 #include "core/InitWindow.h"
 #include "renderer/ShaderLibrary.h"
 #include "scene/Scene.h"
 #include "scene/Components.h"
 #include "scene/Systems.h"
 
-
-//#include <scene/Scene.h>
 using namespace Microsoft::WRL;
 using namespace DirectX;
 
@@ -24,11 +18,13 @@ namespace DxEngine {
 	class Time;
 	class ShaderLibrary;
 	struct ConstantBufferPerRender {
-		XMMATRIX view;
 		XMMATRIX projection;
 		XMFLOAT4 colorLight;
 		XMFLOAT3 directionLight;
 		XMFLOAT2 time;
+	};
+	struct ConstantBufferPerFrame {
+		XMMATRIX view;
 	};
 	struct ConstantBufferPerObject {
 		XMMATRIX world;
@@ -36,11 +32,15 @@ namespace DxEngine {
 	struct BonesCB {
 		XMMATRIX bones[500];
 	};
+	struct RenderPrimitives {
+		Model box;
+	};
 	class RenderStates {
 	public:
 		//std::vector<ComPtr<ID3D11Buffer>> VBA;
 		//std::vector<ComPtr<ID3D11Buffer>> IBA;
 		ComPtr<ID3D11Buffer> cbPerRender;
+		ComPtr<ID3D11Buffer> cbPerFrame;
 		ComPtr<ID3D11Buffer> cbPerObject;
 		ComPtr<ID3D11Buffer> constantBufferBones;
 		ComPtr<ID3D11Texture2D> depthBuffer;
@@ -62,15 +62,17 @@ namespace DxEngine {
 		ComPtr<IDXGISwapChain> swapChain;
 		ComPtr<ID3D11RenderTargetView> mainRenderTargetView;
 
+		RenderPrimitives primitives;
+
+		//cycle buffers
+		ConstantBufferPerObject cbPerObject;
+		ConstantBufferPerFrame cbPerFrame;
+		ConstantBufferPerRender cbPerRender;
 		std::unique_ptr<ImGuiIO> guiContext;
 		std::unique_ptr<RenderStates> renderStates;
 		std::unique_ptr<ShaderLibrary> shaderLibrary;
 		std::unique_ptr<SceneNS::Scene> currentScene;
 		std::unique_ptr<SceneNS::Systems> componentSystems;
-
-	protected:
-		void loadModel();
-		
 	private:
 		void CreateConstantBuffers();
 		void CreateDepthBuffer();
@@ -84,5 +86,7 @@ namespace DxEngine {
 		void CreateScene();
 		void InitRenderStates();
 		void CreateRasterizerState();
+
+		void CreateBoxBuffers();
 	};
 }

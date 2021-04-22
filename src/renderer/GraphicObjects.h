@@ -1,5 +1,18 @@
 #pragma once
 #include <DirectXMath.h>
+#include <array>
+
+using namespace DirectX;
+using namespace Microsoft::WRL;
+
+
+struct position3f {
+	float x, y, z;
+};
+struct direction3f {
+	float x, y, z;
+};
+
 namespace DxEngine {
 	struct Vertex;//forward declaration
 	struct Mesh;
@@ -7,13 +20,18 @@ namespace DxEngine {
 	struct Bone;
 	struct Animation;
 
+	struct Ray {
+		position3f pos;
+		direction3f direction;
+	};
+
 	struct Vertex {
-		DirectX::XMFLOAT3 pos;
-		DirectX::XMFLOAT4 color;
-		DirectX::XMFLOAT2 texCoord;
-		DirectX::XMFLOAT3 normal;
-		DirectX::XMUINT4 boneIDs = { 0, 0, 0, 0 };
-		DirectX::XMFLOAT4 boneWeights = { 0, 0, 0, 0 };
+		XMFLOAT3 pos;
+		XMFLOAT4 color;
+		XMFLOAT2 texCoord;
+		XMFLOAT3 normal;
+		XMUINT4 boneIDs = { 0, 0, 0, 0 };
+		XMFLOAT4 boneWeights = { 0, 0, 0, 0 };
 	};
 	struct Mesh {
 		std::vector<Vertex> vertices;//data
@@ -21,18 +39,18 @@ namespace DxEngine {
 		std::vector<std::shared_ptr<Texture>> textures;
 		std::map<std::string, unsigned int> boneMap; //second parameter = position in vector if bones
 		std::vector<Bone> boneList;
-		DirectX::XMMATRIX meshInverseTransform;
-		Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer, indexBuffer;
+		XMMATRIX meshInverseTransform;
+		ComPtr<ID3D11Buffer> vertexBuffer, indexBuffer;
 	};
 	struct Texture {
 		unsigned int id;
 		std::string type;
 		std::string path;
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture = nullptr;
+		ComPtr<ID3D11ShaderResourceView> texture = nullptr;
 	};
 	struct Bone {
-		DirectX::XMMATRIX offsetMat;
-		DirectX::XMMATRIX finalTransform;
+		XMMATRIX offsetMat;
+		XMMATRIX finalTransform;
 	};
 	struct Animation {
 		std::string a;

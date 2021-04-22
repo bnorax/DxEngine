@@ -1,4 +1,5 @@
 #include "ShaderLibrary.h"
+#include <d3dcompiler.h>
 
 namespace sfs = std::filesystem;
 

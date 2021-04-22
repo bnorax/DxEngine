@@ -1,8 +1,6 @@
 #pragma once
 #include <entt/entt.hpp>
-
 class Renderer;
-
 namespace DxEngine::SceneNS {
 	class CameraSystem {
 	public:

@@ -1,13 +1,14 @@
 #pragma once
 #include "entt/entt.hpp"
 #include <assimp/scene.h>
-#include "renderer/Renderer.h"
-#include <scene/components/Model.h>
-#include <scene/components/Skybox.h>
+#include "renderer/GraphicObjects.h"
 
 namespace DxEngine {
 	class Renderer;
 	namespace SceneNS {
+		namespace Components {
+			struct Model;
+		}
 		class ModelSystem {
 		public:
 			ModelSystem(Renderer& pRenderer) : renderer(pRenderer) {};

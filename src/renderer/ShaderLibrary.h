@@ -1,8 +1,4 @@
 #pragma once
-#include <dxpch.h>
-#include "renderer/Renderer.h"
-
-#include <filesystem>
 
 namespace DxEngine {
 	class PixelShader {

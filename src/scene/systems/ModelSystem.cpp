@@ -1,15 +1,16 @@
 #include <dxpch.h>
 
-#include "scene/components/Model.h"
 #include "renderer/Renderer.h"
 //#include "scene/components/Renderable.h"
 
 #include "assimp/Importer.hpp"
 #include "assimp/postprocess.h"
-#include "assimp/scene.h"
 
 #include "WICTextureLoader.h"
 
+#include <scene/components/Model.h>
+#include <scene/components/Skybox.h>
+#include <scene/components/Renderable.h>
 void DxEngine::SceneNS::ModelSystem::MeshInit(Mesh& mesh) {
 	HRESULT hr;
 	D3D11_BUFFER_DESC vbd;
@@ -410,39 +411,40 @@ void DxEngine::SceneNS::ModelSystem::Draw(entt::registry& registry) {
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
 	for (auto entity : view) {
-		auto model = view.get<Components::Model>(entity);///////
-		if (registry.has<Components::Skybox>(entity)) {
-			auto mesh = model.meshes[0];
-			renderer.deviceContext->RSSetState(renderer.renderStates->rasterizerState.Get());
-			renderer.deviceContext->IASetVertexBuffers(0, 1, mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
-			renderer.deviceContext->IASetIndexBuffer(mesh->indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-			ConstantBufferPerObject cb;
-			if (!mesh->textures.empty())
-				renderer.deviceContext->PSSetShaderResources(1, 1, mesh->textures[0]->texture.GetAddressOf());
-			cb.world = XMMatrixTranspose(renderer.wvp.world);
-			renderer.deviceContext->UpdateSubresource(renderer.renderStates->cbPerObject.Get(), 0, nullptr, &cb, 0, 0);
-			renderer.deviceContext->DrawIndexed(static_cast<unsigned int>(mesh->indices.size()), 0, 0);
-			continue;
+		if (registry.get<Components::Renderable>(entity).render == true) {
+			auto model = view.get<Components::Model>(entity);///////
+			if (registry.has<Components::Skybox>(entity)) {
+				auto mesh = model.meshes[0];
+				renderer.deviceContext->RSSetState(renderer.renderStates->rasterizerState_nbf.Get());
+				renderer.deviceContext->IASetVertexBuffers(0, 1, mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
+				renderer.deviceContext->IASetIndexBuffer(mesh->indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+				if (!mesh->textures.empty())
+					renderer.deviceContext->PSSetShaderResources(1, 1, mesh->textures[0]->texture.GetAddressOf());
+				renderer.cbPerObject.world = XMMatrixTranspose(XMMatrixScaling(100.0f, 100.0f, 100.0f) * XMMatrixIdentity());
+				renderer.deviceContext->UpdateSubresource(renderer.renderStates->cbPerObject.Get(), 0, nullptr, &renderer.cbPerObject.world, 0, 0);
+				renderer.deviceContext->DrawIndexed(static_cast<unsigned int>(mesh->indices.size()), 0, 0);
+				continue;
+			}
+			for (auto mesh : model.meshes) {
+				renderer.deviceContext->RSSetState(renderer.renderStates->rasterizerState.Get());
+				renderer.deviceContext->IASetVertexBuffers(0, 1, mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
+				renderer.deviceContext->IASetIndexBuffer(mesh->indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+				if (!mesh->textures.empty())
+					renderer.deviceContext->PSSetShaderResources(1, 1, mesh->textures[0]->texture.GetAddressOf());
+				//BonesCB bonesCB;
+				//float a = (float)time.GetTimeSinceAppStart();
+				//BoneTransform(a / 1000);
+				//for (UINT i = 0; i < boneList.size() && i < 500; i++) {
+				//	bonesCB.bones[i] = XMMatrixTranspose(boneList[i].finalTransform);
+					//bonesCB.bones[i] = boneList[i].finalTransform;
+				//}
+				renderer.cbPerObject.world = XMMatrixTranspose(XMMatrixIdentity());
+				renderer.deviceContext->UpdateSubresource(renderer.renderStates->cbPerObject.Get(), 0, nullptr, &renderer.cbPerObject.world, 0, 0);
+				//renderer.deviceContext->UpdateSubresource(g_pConstantBufferBones, 0, nullptr, &bonesCB, 0, 0);
+				renderer.deviceContext->DrawIndexed(static_cast<unsigned int>(mesh->indices.size()), 0, 0);
+			}
+			//renderer.deviceContext->DrawIndexed()
 		}
-		for (auto mesh : model.meshes) {
-			renderer.deviceContext->IASetVertexBuffers(0, 1, mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
-			renderer.deviceContext->IASetIndexBuffer(mesh->indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-			ConstantBufferPerObject cb;
-			if (!mesh->textures.empty())
-				renderer.deviceContext->PSSetShaderResources(1, 1, mesh->textures[0]->texture.GetAddressOf());
-			//BonesCB bonesCB;
-			//float a = (float)time.GetTimeSinceAppStart();
-			//BoneTransform(a / 1000);
-			//for (UINT i = 0; i < boneList.size() && i < 500; i++) {
-			//	bonesCB.bones[i] = XMMatrixTranspose(boneList[i].finalTransform);
-				//bonesCB.bones[i] = boneList[i].finalTransform;
-			//}
-			cb.world = XMMatrixTranspose(renderer.wvp.world);
-			renderer.deviceContext->UpdateSubresource(renderer.renderStates->cbPerObject.Get(), 0, nullptr, &cb, 0, 0);
-			//renderer.deviceContext->UpdateSubresource(g_pConstantBufferBones, 0, nullptr, &bonesCB, 0, 0);
-			renderer.deviceContext->DrawIndexed(static_cast<unsigned int>(mesh->indices.size()), 0, 0);
-		}
-		//renderer.deviceContext->DrawIndexed()
 	}
 
 }

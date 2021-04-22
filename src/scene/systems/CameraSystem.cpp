@@ -1,6 +1,5 @@
 #include <renderer/Renderer.h>
 
-
 void DxEngine::SceneNS::CameraSystem::Update(entt::registry& registry)
 {
 	auto regView = registry.view<Components::Camera>();
@@ -12,16 +11,16 @@ void DxEngine::SceneNS::CameraSystem::Update(entt::registry& registry)
 			ScreenToClient(GetActiveWindow(), &camera.curPoint);
 			if (&camera.curPoint || &camera.prevPoint != NULL) {
 				if (camera.curPoint.y - camera.prevPoint.y > 1) {
-					renderer.wvp.view *= XMMatrixRotationX(-0.01f);
+					renderer.cbPerFrame.view *= XMMatrixRotationX(-0.01f);
 				}
 				else if (camera.curPoint.y - camera.prevPoint.y < -1) {
-					renderer.wvp.view *= XMMatrixRotationX(0.01f);
+					renderer.cbPerFrame.view *= XMMatrixRotationX(0.01f);
 				}
 				if (camera.curPoint.x - camera.prevPoint.x > 1) {
-					renderer.wvp.view *= XMMatrixRotationY(-0.02f);
+					renderer.cbPerFrame.view *= XMMatrixRotationY(-0.02f);
 				}
 				else if (camera.curPoint.x - camera.prevPoint.x < -1) {
-					renderer.wvp.view *= XMMatrixRotationY(0.02f);
+					renderer.cbPerFrame.view *= XMMatrixRotationY(0.02f);
 				}
 			}
 		}
@@ -29,20 +28,23 @@ void DxEngine::SceneNS::CameraSystem::Update(entt::registry& registry)
 			boost = 10;
 		}
 		if (GetAsyncKeyState(0x57) < 0) {
-			renderer.wvp.view *= XMMatrixTranslation(0, 0, -0.01f * boost);
+			renderer.cbPerFrame.view *= XMMatrixTranslation(0, 0, -0.01f * boost);
 		}
 		if (GetAsyncKeyState(0x53) < 0) {
-			renderer.wvp.view *= XMMatrixTranslation(0, 0, 0.01f * boost);
+			renderer.cbPerFrame.view *= XMMatrixTranslation(0, 0, 0.01f * boost);
 		}
 		if (GetAsyncKeyState(0x44) < 0) {
-			renderer.wvp.view *= XMMatrixTranslation(-0.01f * boost, 0, 0);
+			renderer.cbPerFrame.view *= XMMatrixTranslation(-0.01f * boost, 0, 0);
 		}
 		if (GetAsyncKeyState(0x41) < 0) {
-			renderer.wvp.view *= XMMatrixTranslation(0.01f * boost, 0, 0);
+			renderer.cbPerFrame.view *= XMMatrixTranslation(0.01f * boost, 0, 0);
 		}
 		GetCursorPos(&camera.prevPoint);
 		ScreenToClient(GetActiveWindow(), &camera.prevPoint);
 		registry.replace<Components::Camera>(entity, camera);
+		ConstantBufferPerFrame cb = renderer.cbPerFrame;
+		cb.view = XMMatrixTranspose(cb.view);
+		renderer.deviceContext->UpdateSubresource(renderer.renderStates->cbPerFrame.Get(), 0, nullptr, &cb, 0, 0);
 	}
 	
 }

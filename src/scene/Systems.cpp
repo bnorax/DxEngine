@@ -7,11 +7,13 @@ void DxEngine::SceneNS::Systems::InitSystems()
 	renderSystem = std::make_unique<RenderSystem>(renderer);
 	modelSystem = std::make_unique<ModelSystem>(renderer);
 	cameraSystem = std::make_unique<CameraSystem>(renderer);
+	boxColliderSystem = std::make_unique<BoxColliderSystem>(renderer);
 }
 
 void DxEngine::SceneNS::Systems::UpdateFrame()
 {
 	cameraSystem->Update(scene.registry);
+	boxColliderSystem->RaycastCollision(scene.registry);
 	renderSystem->Draw(scene.registry);
 	modelSystem->Draw(scene.registry);
 }

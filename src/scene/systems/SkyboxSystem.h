@@ -1,5 +1,4 @@
 #pragma once
-#include "renderer/Renderer.h"
 #include "entt/entt.hpp"
 namespace DxEngine {
 	class Renderer;
