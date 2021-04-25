@@ -11,6 +11,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 	auto& timeSingl = DxEngine::Time::Instance();
 	std::unique_ptr<DxEngine::Window> mainWindow = std::make_unique<DxEngine::Window>(1920, 1080, _T("DxEngine App"));
 	mainWindow->InitWindow();

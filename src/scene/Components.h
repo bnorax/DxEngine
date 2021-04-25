@@ -5,7 +5,8 @@
 #include "components/Skybox.h"
 #include "components/Transforms.h"
 #include "components/BoxCollider.h"
-
+#include "components/AudioSource.h"
+#include "components/AudioListener.h"
 namespace DxEngine::SceneNS::Components {
 	struct Renderable;
 	struct Model;
@@ -13,4 +14,6 @@ namespace DxEngine::SceneNS::Components {
 	struct Skybox;
 	struct Transforms;
 	struct BoxCollider;
+	struct AudioSource;
+	struct AudioListener;
 }

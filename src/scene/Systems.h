@@ -4,6 +4,7 @@
 #include "scene/systems/RenderSystem.h"
 #include "scene/systems/CameraSystem.h"
 #include "scene/systems/BoxColliderSystem.h"
+#include "scene/systems/audio/AudioSystem.h"
 
 namespace DxEngine {
 	class Renderer;
@@ -21,6 +22,7 @@ namespace DxEngine {
 			std::unique_ptr<ModelSystem> modelSystem;
 			std::unique_ptr<CameraSystem> cameraSystem;
 			std::unique_ptr<BoxColliderSystem> boxColliderSystem;
+			std::unique_ptr<AudioSystem> audioSystem;
 			void UpdateFrame();
 		private:
 			Renderer& renderer;

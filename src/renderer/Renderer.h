@@ -32,9 +32,6 @@ namespace DxEngine {
 	struct BonesCB {
 		XMMATRIX bones[500];
 	};
-	struct RenderPrimitives {
-		Model box;
-	};
 	class RenderStates {
 	public:
 		//std::vector<ComPtr<ID3D11Buffer>> VBA;
@@ -57,22 +54,24 @@ namespace DxEngine {
 		Renderer(Window&);
 		void RenderFrame();
 		Window& windowRef;
+		//Core renderer objects refs
 		ComPtr<ID3D11Device> device;
 		ComPtr<ID3D11DeviceContext> deviceContext;	
 		ComPtr<IDXGISwapChain> swapChain;
 		ComPtr<ID3D11RenderTargetView> mainRenderTargetView;
 
-		RenderPrimitives primitives;
-
 		//cycle buffers
 		ConstantBufferPerObject cbPerObject;
 		ConstantBufferPerFrame cbPerFrame;
 		ConstantBufferPerRender cbPerRender;
+		//other render info
 		std::unique_ptr<ImGuiIO> guiContext;
 		std::unique_ptr<RenderStates> renderStates;
 		std::unique_ptr<ShaderLibrary> shaderLibrary;
 		std::unique_ptr<SceneNS::Scene> currentScene;
 		std::unique_ptr<SceneNS::Systems> componentSystems;
+
+
 	private:
 		void CreateConstantBuffers();
 		void CreateDepthBuffer();

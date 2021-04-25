@@ -26,8 +26,8 @@ void DxEngine::SceneNS::BoxColliderSystem::RaycastCollision(entt::registry& regi
 		//rayEnd = XMVector3Transform(rayEnd, inverseProj);
 		//XMVECTOR direction = rayEnd - rayOrigin;
 		//direction = XMVector3Normalize(direction);
-		XMVECTOR start = XMVector3Unproject(XMVECTOR{ x, y,  0}, 0, 0, renderer.windowRef.width, renderer.windowRef.height, 0, 1, renderer.cbPerRender.projection, renderer.cbPerFrame.view, XMMatrixIdentity());
-		XMVECTOR end = XMVector3Unproject(XMVECTOR{ x, y,  1 }, 0, 0, renderer.windowRef.width, renderer.windowRef.height, 0, 1, renderer.cbPerRender.projection, renderer.cbPerFrame.view, XMMatrixIdentity());
+		XMVECTOR start = XMVector3Unproject(XMVECTOR{ x, y,  0}, 0, 0, (float)renderer.windowRef.width, (float)renderer.windowRef.height, 0, 1, renderer.cbPerRender.projection, renderer.cbPerFrame.view, XMMatrixIdentity());
+		XMVECTOR end = XMVector3Unproject(XMVECTOR{ x, y,  1 }, 0, 0, (float)renderer.windowRef.width, (float)renderer.windowRef.height, 0, 1, renderer.cbPerRender.projection, renderer.cbPerFrame.view, XMMatrixIdentity());
 		XMVECTOR dir = end - start;
 		dir = XMVector3Normalize(dir);
 		float length = 100.0f;

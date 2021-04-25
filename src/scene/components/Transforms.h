@@ -1,15 +1,16 @@
 #pragma once
 #include <array>
-#include "renderer/GraphicObjects.h"
+#include <DirectXMath.h>
 namespace DxEngine {
 	namespace SceneNS::Components {
 		struct Transforms {
-			Transforms(std::array<float, 3> pRotation, std::array<float, 3> pScale) :
+			Transforms(DirectX::XMFLOAT3 pPosition, DirectX::XMFLOAT3 pRotation, DirectX::XMFLOAT3 pScale) :
+				position(pPosition),
 				rotation(pRotation),
 				scale(pScale){};
-			position3f pos;
-			std::array<float, 3> rotation;
-			std::array<float, 3> scale;
+			DirectX::XMFLOAT3 position;
+			DirectX::XMFLOAT3 rotation;
+			DirectX::XMFLOAT3 scale;
 		};
 	}
 }

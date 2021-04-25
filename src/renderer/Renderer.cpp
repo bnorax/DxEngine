@@ -36,7 +36,7 @@ void DxEngine::Renderer::CreateConstantBuffers()
 
 void DxEngine::Renderer::CreateBoxBuffers()
 {
-	HRESULT hr;
+	/*HRESULT hr;
 	D3D11_BUFFER_DESC vbd;
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
 	vbd.ByteWidth = static_cast<UINT>(sizeof(Vertex) * primitives.box.vertices.size());
@@ -50,7 +50,7 @@ void DxEngine::Renderer::CreateBoxBuffers()
 	hr = device->CreateBuffer(&vbd, &initData, primitives.box.vertexBuffer.GetAddressOf());
 	if (FAILED(hr)) {
 		throw std::runtime_error("Failed to create vertex buffer.");
-	}
+	}*/
 }
 
 void DxEngine::Renderer::CreateDepthBuffer()
@@ -236,14 +236,20 @@ DxEngine::Renderer::Renderer(Window &window) : windowRef(window)
 
 	CreateScene();
 
+	auto camera = currentScene->registry.create();
+	currentScene->registry.emplace<Camera>(camera);
+	currentScene->registry.emplace<AudioListener>(camera);
+	currentScene->registry.emplace<Transforms>(camera, XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f));
+
 	auto entity = currentScene->registry.create();
-	currentScene->registry.emplace<Camera>(entity);
 	currentScene->registry.emplace<Renderable>(entity);
 	currentScene->registry.emplace<Model>(entity, "resources\\mesh\\fox.glb");
-	BoxCollider collider;
-	collider.colliderBox.Center = { 0.0f,  0.0f, 0.0f };
-	collider.colliderBox.Extents = { 2.0f,  2.0f,  2.0f };
-	currentScene->registry.emplace<BoxCollider>(entity, collider);
+	currentScene->registry.emplace<AudioSource>(entity, "resources\\sounds\\takeme.wav");
+	currentScene->registry.emplace<Transforms>(entity, XMFLOAT3(2.0f, 2.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f));
+	//BoxCollider collider;
+	//collider.colliderBox.Center = { 0.0f,  0.0f, 0.0f };
+	//collider.colliderBox.Extents = { 2.0f,  2.0f,  2.0f };
+	//currentScene->registry.emplace<BoxCollider>(entity, collider);
 
 	auto skyboxEntity = currentScene->registry.create();
 	currentScene->registry.emplace<Renderable>(skyboxEntity);
@@ -253,31 +259,13 @@ DxEngine::Renderer::Renderer(Window &window) : windowRef(window)
 	componentSystems = std::make_unique<SceneNS::Systems>(*this, *currentScene.get());
 	componentSystems->InitSystems();
 	componentSystems->modelSystem->Load(currentScene->registry);
-	//auto model = currentScene->registry.get<SceneNS::Components::Model>(entity);
-	//loadModel();
-	/*D3D11_BLEND_DESC bs;
-	ZeroMemory(&bs, sizeof(bs));
-	bs.RenderTarget[0].BlendEnable = false;
-	bs.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-	g_pd3dDevice->CreateBlendState(&bs, &g_blendState);
-
-	D3D11_BLEND_DESC bs2;
-	ZeroMemory(&bs2, sizeof(bs2));
-	bs2.RenderTarget[0].BlendEnable = true;
-	bs2.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-	bs2.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-	bs2.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-	bs2.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-	bs2.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
-	bs2.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-	bs2.RenderTarget[0].RenderTargetWriteMask = 0x0f;
-	g_pd3dDevice->CreateBlendState(&bs2, &g_blendStateAlpha);*/
-
+	//componentSystems->audioEmitterSystem->LoadSoundFromFS();
 }
 
 void DxEngine::Renderer::RenderFrame()
 {
 	componentSystems->UpdateFrame();
+	
 
 	swapChain->Present(0, 0);
 	//imgui
@@ -345,10 +333,3 @@ void DxEngine::Renderer::RenderFrame()
 
 	//swapChain->Present(0, 0);
 }
-
-
-//DxEngine::Scene * DxEngine::Render::loadScene()
-//{
-//
-//	return nullptr;
-//}
