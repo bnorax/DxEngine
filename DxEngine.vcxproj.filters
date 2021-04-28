@@ -1,0 +1,262 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{f10cfbeb-4ba5-4068-a520-fd9431496c6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external">
+      <UniqueIdentifier>{c12df182-6e8f-48b9-8c0b-b41965738f90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="external\imgui">
+      <UniqueIdentifier>{ffa6cf87-0e71-4541-90ac-987a0a2fc22e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core">
+      <UniqueIdentifier>{f1b075ed-7d7e-411a-aec3-ba22ea8f17ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource\font">
+      <UniqueIdentifier>{1a893e16-632a-4a31-9ce9-05f765d5f9e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\entt">
+      <UniqueIdentifier>{74d42279-4170-4ab1-a390-aba1852cfbab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\controls">
+      <UniqueIdentifier>{e7ca327b-c951-4278-b3d6-7169dde89f34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource\shaders">
+      <UniqueIdentifier>{7163b106-b29f-4d88-83b9-e553d3d9d231}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource\shaders\pixel">
+      <UniqueIdentifier>{3baa9a23-26f1-4275-bdd5-1604fed472b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource\shaders\vertex">
+      <UniqueIdentifier>{d2abd026-cf5b-41c3-9448-509cdff47fb5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\scene">
+      <UniqueIdentifier>{c9843ea3-4c96-492a-88ee-338997ce3610}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\scene\components">
+      <UniqueIdentifier>{9b9705f5-c513-4f8a-964f-9e9d3ec1752a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\scene\systems">
+      <UniqueIdentifier>{90fe1373-5dad-4348-b51e-1e8e8e6a17c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\renderer">
+      <UniqueIdentifier>{9b2be666-378a-4c53-91ff-cd98354a3807}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\scene\systems\audio">
+      <UniqueIdentifier>{088dafd3-2a44-4121-84b1-16a6e52b58d6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\imgui\imconfig.h">
+      <Filter>external\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui\imgui.h">
+      <Filter>external\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui\imgui_impl_dx11.h">
+      <Filter>external\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui\imgui_impl_win32.h">
+      <Filter>external\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui\imgui_internal.h">
+      <Filter>external\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui\imstb_rectpack.h">
+      <Filter>external\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui\imstb_textedit.h">
+      <Filter>external\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\imgui\imstb_truetype.h">
+      <Filter>external\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\InitWindow.h">
+      <Filter>src\core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\entt\entt.hpp">
+      <Filter>external\entt</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DxEngine.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\Main.h">
+      <Filter>src\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dxpch.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\Scene.h">
+      <Filter>src\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\Time.h">
+      <Filter>src\core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\Components.h">
+      <Filter>src\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\components\OMesh.h">
+      <Filter>src\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\components\OModel.h">
+      <Filter>src\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\systems\RenderSystem.h">
+      <Filter>src\scene\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\Renderer.h">
+      <Filter>src\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\ShaderLibrary.h">
+      <Filter>src\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\components\Renderable.h">
+      <Filter>src\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\components\Camera.h">
+      <Filter>src\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\systems\CameraSystem.h">
+      <Filter>src\scene\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\Systems.h">
+      <Filter>src\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\components\Model.h">
+      <Filter>src\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\systems\ModelSystem.h">
+      <Filter>src\scene\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\components\Skybox.h">
+      <Filter>src\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\systems\SkyboxSystem.h">
+      <Filter>src\scene\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\renderer\GraphicObjects.h">
+      <Filter>src\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\components\Transforms.h">
+      <Filter>src\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\components\BoxCollider.h">
+      <Filter>src\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\systems\BoxColliderSystem.h">
+      <Filter>src\scene\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\components\AudioSource.h">
+      <Filter>src\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\components\AudioListener.h">
+      <Filter>src\scene\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\systems\audio\AudioListenerSystem.h">
+      <Filter>src\scene\systems\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\systems\audio\AudioSourceSystem.h">
+      <Filter>src\scene\systems\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scene\systems\audio\AudioSystem.h">
+      <Filter>src\scene\systems\audio</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="include\imgui\imgui.cpp">
+      <Filter>external\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui\imgui_demo.cpp">
+      <Filter>external\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui\imgui_draw.cpp">
+      <Filter>external\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui\imgui_impl_dx11.cpp">
+      <Filter>external\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui\imgui_impl_win32.cpp">
+      <Filter>external\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui\imgui_widgets.cpp">
+      <Filter>external\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\InitWindow.cpp">
+      <Filter>src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\Main.cpp">
+      <Filter>src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dxpch.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scene\Scene.cpp">
+      <Filter>src\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\Time.cpp">
+      <Filter>src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scene\systems\RenderSystem.cpp">
+      <Filter>src\scene\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderer\Renderer.cpp">
+      <Filter>src\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderer\ShaderLibrary.cpp">
+      <Filter>src\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scene\systems\CameraSystem.cpp">
+      <Filter>src\scene\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scene\Systems.cpp">
+      <Filter>src\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scene\systems\ModelSystem.cpp">
+      <Filter>src\scene\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scene\systems\SkyboxSystem.cpp">
+      <Filter>src\scene\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scene\systems\BoxColliderSystem.cpp">
+      <Filter>src\scene\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scene\systems\audio\AudioSystem.cpp">
+      <Filter>src\scene\systems\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scene\systems\audio\AudioListenerSystem.cpp">
+      <Filter>src\scene\systems\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scene\systems\audio\AudioSourceSystem.cpp">
+      <Filter>src\scene\systems\audio</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="include\imgui\imgui.ini">
+      <Filter>external\imgui</Filter>
+    </None>
+    <None Include="resources\font\myfile.spritefont">
+      <Filter>resource\font</Filter>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="resources\shaders\pixel\textured.hlsl">
+      <Filter>resource\shaders\pixel</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\pixel\solid.hlsl">
+      <Filter>resource\shaders\pixel</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\vertex\VertexShader.hlsl">
+      <Filter>resource\shaders\vertex</Filter>
+    </FxCompile>
+  </ItemGroup>
+</Project>
