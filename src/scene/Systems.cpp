@@ -13,7 +13,7 @@ void DxEngine::SceneNS::Systems::InitSystems()
 
 void DxEngine::SceneNS::Systems::UpdateFrame()
 {
-	audioSystem->UpdateFrame();
+	audioSystem->Update();
 	cameraSystem->Update(scene.registry);
 	//boxColliderSystem->RaycastCollision(scene.registry);
 	renderSystem->Draw(scene.registry);

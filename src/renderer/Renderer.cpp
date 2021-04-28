@@ -245,7 +245,7 @@ DxEngine::Renderer::Renderer(Window &window) : windowRef(window)
 	currentScene->registry.emplace<Renderable>(entity);
 	currentScene->registry.emplace<Model>(entity, "resources\\mesh\\fox.glb");
 	currentScene->registry.emplace<AudioSource>(entity, "resources\\sounds\\takeme.wav");
-	currentScene->registry.emplace<Transforms>(entity, XMFLOAT3(2.0f, 2.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f));
+	currentScene->registry.emplace<Transforms>(entity, XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f));
 	//BoxCollider collider;
 	//collider.colliderBox.Center = { 0.0f,  0.0f, 0.0f };
 	//collider.colliderBox.Extents = { 2.0f,  2.0f,  2.0f };
@@ -259,7 +259,8 @@ DxEngine::Renderer::Renderer(Window &window) : windowRef(window)
 	componentSystems = std::make_unique<SceneNS::Systems>(*this, *currentScene.get());
 	componentSystems->InitSystems();
 	componentSystems->modelSystem->Load(currentScene->registry);
-	//componentSystems->audioEmitterSystem->LoadSoundFromFS();
+	componentSystems->audioSystem->sourceSystem->LoadSoundFromFS();
+	componentSystems->audioSystem->sourceSystem->PlaySoundOnce();
 }
 
 void DxEngine::Renderer::RenderFrame()

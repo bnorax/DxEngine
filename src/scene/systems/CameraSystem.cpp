@@ -1,10 +1,12 @@
 #include <renderer/Renderer.h>
+#include <scene/components/Transforms.h>
 
 void DxEngine::SceneNS::CameraSystem::Update(entt::registry& registry)
 {
 	auto regView = registry.view<Components::Camera>();
 	for (auto entity : regView) {
-		auto camera = regView.get<Components::Camera>(entity);
+		Components::Transforms& transfrom = registry.get<Components::Transforms>(entity);
+		Components::Camera& camera = registry.get<Components::Camera>(entity);
 		float boost = 1;
 		if (GetAsyncKeyState(VK_RBUTTON) < 0) {
 			GetCursorPos(&camera.curPoint);
@@ -29,19 +31,23 @@ void DxEngine::SceneNS::CameraSystem::Update(entt::registry& registry)
 		}
 		if (GetAsyncKeyState(0x57) < 0) {
 			renderer.cbPerFrame.view *= XMMatrixTranslation(0, 0, -0.01f * boost);
+			transfrom.position.z -= 0.01f * boost;
 		}
 		if (GetAsyncKeyState(0x53) < 0) {
 			renderer.cbPerFrame.view *= XMMatrixTranslation(0, 0, 0.01f * boost);
+			transfrom.position.z += 0.01f * boost;
 		}
 		if (GetAsyncKeyState(0x44) < 0) {
 			renderer.cbPerFrame.view *= XMMatrixTranslation(-0.01f * boost, 0, 0);
+			transfrom.position.x -= 0.01f * boost;
 		}
 		if (GetAsyncKeyState(0x41) < 0) {
 			renderer.cbPerFrame.view *= XMMatrixTranslation(0.01f * boost, 0, 0);
+			transfrom.position.x += 0.01f * boost;
 		}
 		GetCursorPos(&camera.prevPoint);
 		ScreenToClient(GetActiveWindow(), &camera.prevPoint);
-		registry.replace<Components::Camera>(entity, camera);
+	//	registry.replace<Components::Camera>(entity, camera);
 		ConstantBufferPerFrame cb = renderer.cbPerFrame;
 		cb.view = XMMatrixTranspose(cb.view);
 		renderer.deviceContext->UpdateSubresource(renderer.renderStates->cbPerFrame.Get(), 0, nullptr, &cb, 0, 0);

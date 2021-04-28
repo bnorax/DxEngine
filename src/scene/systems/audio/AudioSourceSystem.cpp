@@ -3,8 +3,18 @@
 #include "scene/components/AudioSource.h"
 #include "renderer/Renderer.h"
 #include "scene/components/Transforms.h"
-#include "scene/components/AudioListener.h"
+#include "core/Time.h"
 namespace sfs = std::filesystem;
+DxEngine::SceneNS::AudioSourceSystem::AudioSourceSystem(DirectX::AudioEngine* pAudio, entt::registry& pReg)
+	: audioEngine(pAudio), registry(pReg)
+{
+	auto view = registry.view<Components::AudioSource>();
+	for (auto entity : view) {
+		Components::AudioSource& source = registry.get<Components::AudioSource>(entity);
+		source.emitter = std::make_unique<DirectX::AudioEmitter>();
+		source.emitter->ChannelCount = 2;
+	}
+}
 void DxEngine::SceneNS::AudioSourceSystem::LoadSoundFromFS()
 {
 	using namespace Components;
@@ -12,41 +22,29 @@ void DxEngine::SceneNS::AudioSourceSystem::LoadSoundFromFS()
 	for (auto entity : view) {
 		AudioSource& source = registry.get<AudioSource>(entity);
 		sfs::path pathToSound(source.pathToSound);
-		source.sound = std::make_shared<DirectX::SoundEffect>(renderer.soundEngine->audioEngine.get(), pathToSound.wstring().c_str());
+		source.sound = std::make_shared<DirectX::SoundEffect>(audioEngine, pathToSound.wstring().c_str());
 	}
 }
 
 void DxEngine::SceneNS::AudioSourceSystem::PlaySoundOnce()
 {
 	using namespace Components;
-	if (check) {
-		return;
-	}
 	auto view = registry.view<AudioSource>();
 	for (auto entity:view) {
 		AudioSource& component = registry.get<AudioSource>(entity);
-		Transforms& transform = registry.get<Transforms>(entity);
-		component.emitter.SetPosition(transform.position);
-		component.emitter.ChannelCount = 2;
-		auto viewL = registry.view<AudioListener>();
-		for (auto entityL : viewL) {
-			AudioListener& list = registry.get<AudioListener>(entityL);
-			auto effect = component.sound->CreateInstance(SoundEffectInstance_Use3D);
-			effect->Play(true);
-			effect->Apply3D(list.listener, component.emitter, false);
-			check = true;
-		}
+		component.soundInstance = component.sound->CreateInstance(SoundEffectInstance_Use3D);
+		component.soundInstance->SetVolume(0.05f);
+		component.soundInstance->Play();
 	}
-	//check = true;
 }
 
-void DxEngine::SceneNS::AudioSourceSystem::UpdateFrame()
+void DxEngine::SceneNS::AudioSourceSystem::Update()
 {
-	if (!renderer.soundEngine->audioEngine->Update())
-	{
-		// No audio device is active
-		if (renderer.soundEngine->audioEngine->IsCriticalError())
-		{
-		}
+	using namespace Components;
+	auto view = registry.view<AudioSource>();
+	for (auto entity : view) {
+		AudioSource& source = registry.get<AudioSource>(entity);
+		Transforms& transform = registry.get<Transforms>(entity);
+		source.emitter->SetPosition(transform.position);
 	}
 }

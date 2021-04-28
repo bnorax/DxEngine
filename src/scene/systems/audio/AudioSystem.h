@@ -9,10 +9,10 @@ namespace DxEngine {
 		class AudioSystem {
 		public:
 			AudioSystem(Renderer& pRend, entt::registry& pReg);
+			void Update();
+			std::unique_ptr<DirectX::AudioEngine> audioEngine;
 			std::unique_ptr<AudioSourceSystem> sourceSystem;
 			std::unique_ptr<AudioListenerSystem> listenerSystem;
-			std::unique_ptr<DirectX::AudioEngine> audioEngine;
-			void UpdateFrame();
 		private:
 			Renderer& renderer;
 			entt::registry& registry;

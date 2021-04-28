@@ -1,18 +1,19 @@
 #pragma once
 #include <entt/entt.hpp>
-
+namespace DirectX {
+	class AudioEngine;
+}
 namespace DxEngine{
 	class Renderer;
 	namespace SceneNS {
 		class AudioSourceSystem {
 		public:
-			AudioSourceSystem(Renderer& pRend, entt::registry& pReg) : renderer(pRend), registry(pReg) {};
+			AudioSourceSystem(DirectX::AudioEngine*, entt::registry&);
 			void LoadSoundFromFS();
 			void PlaySoundOnce();
-			void UpdateFrame();
-			bool check = false;
+			void Update();
 		private:
-			Renderer& renderer;
+			DirectX::AudioEngine* audioEngine;
 			entt::registry& registry;
 		};
 	}
