@@ -129,7 +129,7 @@ void DxEngine::Renderer::CreateSwapChain()
 	sd.OutputWindow = windowRef.hWnd;
 	sd.SampleDesc.Count = 4;
 	sd.SampleDesc.Quality = 0;
-	sd.Windowed = TRUE;
+	sd.Windowed = true;
 	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	UINT createDeviceFlags = D3D11_CREATE_DEVICE_DEBUG;
 	D3D_FEATURE_LEVEL featureLevel;
@@ -227,6 +227,8 @@ DxEngine::Renderer::Renderer(Window &window) : windowRef(window)
 	cbPerFrame.view = XMMatrixLookAtLH(Eye, At, Up);
 	cbPerRender.projection = XMMatrixPerspectiveFovLH(XM_PIDIV2, 1920 / (FLOAT)1080, 0.01f, 100.0f);
 
+	//SetCursorPos(windowRef.width / 2 + 1, windowRef.height / 2);
+
 	ConstantBufferPerRender rcb = cbPerRender;
 	rcb.projection = XMMatrixTranspose(rcb.projection);
 	ConstantBufferPerFrame cb = cbPerFrame;
@@ -243,8 +245,8 @@ DxEngine::Renderer::Renderer(Window &window) : windowRef(window)
 
 	auto entity = currentScene->registry.create();
 	currentScene->registry.emplace<Renderable>(entity);
-	currentScene->registry.emplace<Model>(entity, "resources\\mesh\\fox.glb");
-	currentScene->registry.emplace<AudioSource>(entity, "resources\\sounds\\takeme.wav");
+	currentScene->registry.emplace<Model>(entity, "resources\\mesh\\soldier.glb");
+	//currentScene->registry.emplace<AudioSource>(entity, "resources\\sounds\\takeme.wav");
 	currentScene->registry.emplace<Transforms>(entity, XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f));
 	//BoxCollider collider;
 	//collider.colliderBox.Center = { 0.0f,  0.0f, 0.0f };

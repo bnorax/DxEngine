@@ -6,6 +6,7 @@
 
 void DxEngine::SceneNS::RenderSystem::Draw(entt::registry& registry)
 {
+
 	auto view = registry.view<Components::Renderable>();
 	for (auto entity : view) {
 		if (view.get<Components::Renderable>(entity).render == true) {

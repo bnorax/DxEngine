@@ -3,7 +3,6 @@
 #include "core/InitWindow.h"
 #include "core/Time.h"
 #include "renderer/Renderer.h"
-
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 //std::unique_ptr<DirectX::SpriteBatch> spriteBatch;
@@ -13,7 +12,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 {
 	CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 	auto& timeSingl = DxEngine::Time::Instance();
-	std::unique_ptr<DxEngine::Window> mainWindow = std::make_unique<DxEngine::Window>(1920, 1080, _T("DxEngine App"));
+	std::unique_ptr<DxEngine::Window> mainWindow = std::make_unique<DxEngine::Window>(1280, 720, _T("DxEngine App"));
 	mainWindow->InitWindow();
 	ShowWindow(mainWindow->hWnd, SW_SHOWDEFAULT);
 	UpdateWindow(mainWindow->hWnd);

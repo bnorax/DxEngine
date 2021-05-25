@@ -21,10 +21,15 @@ void DxEngine::Time::FrameEnd()
 	frameCounter++;
 	QueryPerformanceCounter(&now);
 	prevFrameTime = static_cast<int>((now.QuadPart - beginFrame.QuadPart) / freq.QuadPart);
-	deltaTime += prevFrameTime;
-	if (deltaTime >= 1000) {
+	pDeltaTime += prevFrameTime;
+	if (pDeltaTime >= 1000) {
 		prevFrames = frameCounter;
 		frameCounter = 0;
-		deltaTime = 0;
+		pDeltaTime = 0;
 	}
+}
+
+float DxEngine::Time::deltaTime()
+{
+	return  pDeltaTime /1000.0f;
 }
