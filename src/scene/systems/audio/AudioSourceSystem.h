@@ -11,7 +11,9 @@ namespace DxEngine{
 			AudioSourceSystem(DirectX::AudioEngine*, entt::registry&);
 			void LoadSoundFromFS();
 			void PlaySoundOnce();
+			void PlayLoopedSound();
 			void Update();
+
 		private:
 			DirectX::AudioEngine* audioEngine;
 			entt::registry& registry;

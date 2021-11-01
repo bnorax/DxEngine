@@ -38,6 +38,20 @@ void DxEngine::SceneNS::AudioSourceSystem::PlaySoundOnce()
 	}
 }
 
+void DxEngine::SceneNS::AudioSourceSystem::PlayLoopedSound()
+{
+	using namespace Components;
+	auto view = registry.view<AudioSource>();
+	for (auto entity : view) {
+		AudioSource& component = registry.get<AudioSource>(entity);
+		component.soundInstance = component.sound->CreateInstance(SoundEffectInstance_Use3D);
+		component.soundInstance->SetVolume(0.05f);
+		component.soundInstance->Play(true);
+	}
+}
+
+
+
 void DxEngine::SceneNS::AudioSourceSystem::Update()
 {
 	using namespace Components;

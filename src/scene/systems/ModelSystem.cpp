@@ -11,6 +11,10 @@
 #include <scene/components/Model.h>
 #include <scene/components/Skybox.h>
 #include <scene/components/Renderable.h>
+#include <scene/components/Transforms.h>
+
+#include <core/Time.h>
+
 void DxEngine::SceneNS::ModelSystem::MeshInit(Mesh& mesh) {
 	HRESULT hr;
 	D3D11_BUFFER_DESC vbd;
@@ -207,7 +211,7 @@ void CalcInterpolatedScaling(aiVector3D& Out, float AnimationTime, const aiNodeA
 }
 
 
-DirectX::XMMATRIX aiToXMMATRIX(const aiMatrix4x4& AssimpMatrix) //делаем из aiMatrix(assimp) -> матрицу из директа(XMfloat4x4)
+DirectX::XMMATRIX aiToXMMATRIX(const aiMatrix4x4& AssimpMatrix) //пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ aiMatrix(assimp) -> пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ(XMfloat4x4)
 {
 	DirectX::XMMATRIX m;
 	m = DirectX::XMMatrixIdentity();
@@ -220,7 +224,7 @@ DirectX::XMMATRIX aiToXMMATRIX(const aiMatrix4x4& AssimpMatrix) //делаем из aiMa
 	return m;
 }
 
-DirectX::XMMATRIX aiToXMMATRIX(const aiMatrix3x3& AssimpMatrix) //делаем из aiMatrix(assimp) -> матрицу из директа(XMfloat3x3)
+DirectX::XMMATRIX aiToXMMATRIX(const aiMatrix3x3& AssimpMatrix) //пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ aiMatrix(assimp) -> пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ(XMfloat3x3)
 {
 	DirectX::XMMATRIX m;
 	m = DirectX::XMMatrixIdentity();
@@ -329,32 +333,32 @@ std::shared_ptr<DxEngine::Mesh> DxEngine::SceneNS::ModelSystem::processMesh(Comp
 			curMesh->indices.push_back(face.mIndices[j]);
 	}
 
-	if (mesh->HasBones()) {
-		int numBones = 0;
-		for (unsigned int i = 0; i < mesh->mNumBones; i++) {
-			unsigned int boneIndex = 0;
-			std::string boneName(mesh->mBones[i]->mName.data);
-			if (curMesh->boneMap.find(boneName) == curMesh->boneMap.end()) {
-				boneIndex = numBones;
-				numBones++;
-				Bone bone;
-				curMesh->boneList.push_back(bone);
-				//bone.offsetMat = aiToXMMATRIX(mesh->mBones[i]->mOffsetMatrix);
-				//curMesh.boneMap.insert(std::make_pair(boneName, boneIndex));
-			}
-			else {
-				boneIndex = curMesh->boneMap[boneName];
-			}
-			curMesh->boneMap[boneName] = boneIndex;
-			curMesh->boneList[boneIndex].offsetMat = aiToXMMATRIX(mesh->mBones[i]->mOffsetMatrix);
+	//if (mesh->HasBones()) {
+	//	int numBones = 0;
+	//	for (unsigned int i = 0; i < mesh->mNumBones; i++) {
+	//		unsigned int boneIndex = 0;
+	//		std::string boneName(mesh->mBones[i]->mName.data);
+	//		if (curMesh->boneMap.find(boneName) == curMesh->boneMap.end()) {
+	//			boneIndex = numBones;
+	//			numBones++;
+	//			Bone bone;
+	//			curMesh->boneList.push_back(bone);
+	//			//bone.offsetMat = aiToXMMATRIX(mesh->mBones[i]->mOffsetMatrix);
+	//			//curMesh.boneMap.insert(std::make_pair(boneName, boneIndex));
+	//		}
+	//		else {
+	//			boneIndex = curMesh->boneMap[boneName];
+	//		}
+	//		curMesh->boneMap[boneName] = boneIndex;
+	//		curMesh->boneList[boneIndex].offsetMat = aiToXMMATRIX(mesh->mBones[i]->mOffsetMatrix);
 
-			for (unsigned int j = 0; j < mesh->mBones[i]->mNumWeights; j++) {
-				unsigned int vertID = mesh->mBones[i]->mWeights[j].mVertexId;
-				float weight = mesh->mBones[i]->mWeights[j].mWeight;
-				AddBoneData(curMesh->vertices[vertID], boneIndex, weight);
-			}
-		}
-	}
+	//		for (unsigned int j = 0; j < mesh->mBones[i]->mNumWeights; j++) {
+	//			unsigned int vertID = mesh->mBones[i]->mWeights[j].mVertexId;
+	//			float weight = mesh->mBones[i]->mWeights[j].mWeight;
+	//			AddBoneData(curMesh->vertices[vertID], boneIndex, weight);
+	//		}
+	//	}
+	//}
 
 	if (mesh->mMaterialIndex >= 0) {
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
@@ -370,6 +374,7 @@ std::shared_ptr<DxEngine::Mesh> DxEngine::SceneNS::ModelSystem::processMesh(Comp
 }
 
 void DxEngine::SceneNS::ModelSystem::processNode(aiNode* node, const aiScene* scene, Components::Model& data) {
+
 	for (unsigned int i = 0; i < node->mNumMeshes; i++) {
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 		data.meshes.push_back(this->processMesh(data, mesh, scene));
@@ -388,18 +393,24 @@ bool DxEngine::SceneNS::ModelSystem::Load(entt::registry& registry)
 	for (auto entity : view) {
 		auto component = view.get<Components::Model>(entity);
 		importer.ReadFile(component.filePath,
-			aiProcess_Triangulate |
+			aiProcess_CalcTangentSpace | // calculate tangents and bitangents if possible
+			aiProcess_JoinIdenticalVertices | // join identical vertices/ optimize indexing
+			aiProcess_Triangulate | // Ensure all verticies are triangulated (each 3 vertices are triangle)
+			aiProcess_ImproveCacheLocality | // improve the cache locality of the output vertices
 			aiProcess_RemoveRedundantMaterials | // remove redundant materials
 			aiProcess_FindDegenerates | // remove degenerated polygons from the import
-			aiProcess_FindInvalidData |
-			aiProcess_SortByPType |
-			aiProcess_FlipUVs |
+			aiProcess_FindInvalidData | // detect invalid model data, such as invalid normal vectors
+			aiProcess_GenUVCoords | // convert spherical, cylindrical, box and planar mapping to proper UVs
+			aiProcess_TransformUVCoords | // preprocess UV transformations (scaling, translation ...)
+			aiProcess_FindInstances | // search for instanced meshes and remove them by references to one master
+			aiProcess_LimitBoneWeights |
 			aiProcess_ConvertToLeftHanded);
 		const aiScene* loadedScene = importer.GetScene();
 		if (loadedScene == nullptr) {
 			return false;
 		}
 		component.modelInverseTransform = aiToXMMATRIX(loadedScene->mRootNode->mTransformation);
+
 		processNode(loadedScene->mRootNode, loadedScene, component);
 		registry.replace<Components::Model>(entity, component);
 	}
@@ -407,40 +418,41 @@ bool DxEngine::SceneNS::ModelSystem::Load(entt::registry& registry)
 }
 
 void DxEngine::SceneNS::ModelSystem::Draw(entt::registry& registry) {
+	Time& time = Time::Instance();
 	auto view = registry.view<Components::Model>();
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
 	for (auto entity : view) {
 		if (registry.get<Components::Renderable>(entity).render == true) {
 			auto model = view.get<Components::Model>(entity);///////
+			auto transform = registry.get<Components::Transforms>(entity);
 			if (registry.has<Components::Skybox>(entity)) {
-				auto mesh = model.meshes[0];
 				renderer.deviceContext->RSSetState(renderer.renderStates->rasterizerState_nbf.Get());
-				renderer.deviceContext->IASetVertexBuffers(0, 1, mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
-				renderer.deviceContext->IASetIndexBuffer(mesh->indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-				if (!mesh->textures.empty())
-					renderer.deviceContext->PSSetShaderResources(1, 1, mesh->textures[0]->texture.GetAddressOf());
-				renderer.cbPerObject.world = XMMatrixTranspose(XMMatrixScaling(100.0f, 100.0f, 100.0f) * XMMatrixIdentity());
-				renderer.deviceContext->UpdateSubresource(renderer.renderStates->cbPerObject.Get(), 0, nullptr, &renderer.cbPerObject.world, 0, 0);
-				renderer.deviceContext->DrawIndexed(static_cast<unsigned int>(mesh->indices.size()), 0, 0);
-				continue;
+			}
+			else {
+				renderer.deviceContext->RSSetState(renderer.renderStates->rasterizerState.Get());
 			}
 			for (auto mesh : model.meshes) {
-				renderer.deviceContext->RSSetState(renderer.renderStates->rasterizerState.Get());
 				renderer.deviceContext->IASetVertexBuffers(0, 1, mesh->vertexBuffer.GetAddressOf(), &stride, &offset);
 				renderer.deviceContext->IASetIndexBuffer(mesh->indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 				if (!mesh->textures.empty())
 					renderer.deviceContext->PSSetShaderResources(1, 1, mesh->textures[0]->texture.GetAddressOf());
+
+
 				//BonesCB bonesCB;
 				//float a = (float)time.GetTimeSinceAppStart();
 				//BoneTransform(a / 1000);
-				//for (UINT i = 0; i < boneList.size() && i < 500; i++) {
-				//	bonesCB.bones[i] = XMMatrixTranspose(boneList[i].finalTransform);
-					//bonesCB.bones[i] = boneList[i].finalTransform;
+				//for (UINT i = 0; i < mesh->boneList.size() && i < 500; i++) {
+				//	bonesCB.bones[i] = XMMatrixTranspose(mesh->boneList[i].finalTransform);
+				//	//bonesCB.bones[i] = boneList[i].finalTransform;
 				//}
-				renderer.cbPerObject.world = XMMatrixTranspose(XMMatrixIdentity());
+
+				renderer.cbPerObject.world = XMMatrixTranspose(XMMatrixTranslation(transform.position.x, transform.position.y, transform.position.z)
+											*XMMatrixScaling(transform.scale.x, transform.scale.y, transform.scale.z)
+											*XMMatrixRotationRollPitchYaw(transform.rotation.x * XM_PI / 180, transform.rotation.y * XM_PI / 180, transform.rotation.z * XM_PI / 180)
+											*XMMatrixIdentity());
 				renderer.deviceContext->UpdateSubresource(renderer.renderStates->cbPerObject.Get(), 0, nullptr, &renderer.cbPerObject.world, 0, 0);
-				//renderer.deviceContext->UpdateSubresource(g_pConstantBufferBones, 0, nullptr, &bonesCB, 0, 0);
+				//renderer.deviceContext->UpdateSubresource(renderer.renderStates->constantBufferBones.Get(), 0, nullptr, &bonesCB, 0, 0);
 				renderer.deviceContext->DrawIndexed(static_cast<unsigned int>(mesh->indices.size()), 0, 0);
 			}
 			//renderer.deviceContext->DrawIndexed()
@@ -448,3 +460,14 @@ void DxEngine::SceneNS::ModelSystem::Draw(entt::registry& registry) {
 	}
 
 }
+
+//void DxEngine::SceneNS::ModelSystem::BoneTransform(float timeInSeconds)
+//{
+//	DirectX::XMMATRIX fullBoneTransform = DirectX::XMMatrixIdentity();
+//	float TicksPerSecond = static_cast<float>(scene->mAnimations[0]->mTicksPerSecond != 0 ?
+//		scene->mAnimations[0]->mTicksPerSecond : 25.0f);
+//	float TimeInTicks = timeInSeconds * TicksPerSecond;
+//	float AnimationTime = fmod(TimeInTicks, (float)scene->mAnimations[0]->mDuration);
+//	//float AnimationTime = scene->mAnimations[0]->mDuration / scene->mAnimations[0]->mTicksPerSecond;
+//	ReadNodeHeirarchy(AnimationTime, scene->mRootNode, fullBoneTransform);
+//}

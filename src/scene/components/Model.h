@@ -9,6 +9,7 @@ namespace DxEngine{
 			DirectX::XMMATRIX modelInverseTransform;
 			std::vector<std::shared_ptr<Mesh>> meshes;
 			std::vector<std::shared_ptr<Texture>> loadedTextures;
+			std::vector<std::shared_ptr<Animation>> animations;
 			std::string filePath;
 		};
 	}

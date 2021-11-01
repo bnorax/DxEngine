@@ -3,6 +3,82 @@
 
 namespace sfs = std::filesystem;
 
+
+DxEngine::Renderer::Renderer(Window &window) : windowRef(window)
+{
+	using namespace SceneNS::Components;
+	CreateSwapChain();
+	CreateRenderTarget();
+	CreateViewport();
+	renderStates = std::make_unique<RenderStates>();
+	CreateDepthBuffer();
+	CreateConstantBuffers();
+	CreateSamplerState();
+	CreateRasterizerState();
+	CreateImGUIContext();
+
+	shaderLibrary = std::make_unique<ShaderLibrary>(device.Get());
+	shaderLibrary->LoadFromFile();
+	shaderLibrary->CreateInputLayout();
+
+	deviceContext->VSSetConstantBuffers(0, 1, renderStates->cbPerRender.GetAddressOf());
+	deviceContext->VSSetConstantBuffers(1, 1, renderStates->cbPerObject.GetAddressOf());
+	deviceContext->VSSetConstantBuffers(2, 1, renderStates->constantBufferBones.GetAddressOf());
+	deviceContext->VSSetConstantBuffers(3, 1, renderStates->cbPerFrame.GetAddressOf());
+
+	XMVECTOR Eye = XMVectorSet(0.0f, 2.0f, -5.0f, 0.0f);
+	XMVECTOR At = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	cbPerFrame.view = XMMatrixLookAtLH(Eye, At, Up);
+	cbPerRender.projection = XMMatrixPerspectiveFovLH(XM_PIDIV2, 1920 / (FLOAT)1080, 0.01f, 100.0f);
+
+	//SetCursorPos(windowRef.width / 2 + 1, windowRef.height / 2);
+
+	ConstantBufferPerRender rcb = cbPerRender;
+	rcb.projection = XMMatrixTranspose(rcb.projection);
+	ConstantBufferPerFrame cb = cbPerFrame;
+	cb.view = XMMatrixTranspose(cb.view);
+	deviceContext->UpdateSubresource(renderStates->cbPerRender.Get(), 0, nullptr, &rcb, 0, 0);
+	deviceContext->UpdateSubresource(renderStates->cbPerFrame.Get(), 0, nullptr, &cb, 0, 0);
+
+	CreateScene();
+
+	auto camera = currentScene->registry.create();
+	currentScene->registry.emplace<Camera>(camera);
+	currentScene->registry.emplace<AudioListener>(camera);
+	currentScene->registry.emplace<Transforms>(camera, XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f));
+
+	auto entity = currentScene->registry.create();
+	currentScene->registry.emplace<Renderable>(entity);
+	currentScene->registry.emplace<Model>(entity, "resources\\mesh\\soldier.glb");
+	//currentscene->registry.emplace<audiosource>(entity, "resources\\sounds\\takeme.wav");
+	currentScene->registry.emplace<Transforms>(entity, XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(1.0f, 1.0f, 1.0f));
+	// 
+	//BoxCollider collider;
+	//collider.colliderBox.Center = { 0.0f,  0.0f, 0.0f };
+	//collider.colliderBox.Extents = { 2.0f,  2.0f,  2.0f };
+	//currentScene->registry.emplace<BoxCollider>(entity, collider);
+
+	auto skyboxEntity = currentScene->registry.create();
+	currentScene->registry.emplace<Renderable>(skyboxEntity);
+	currentScene->registry.emplace<Model>(skyboxEntity, std::string("resources\\mesh\\skybox.glb"));
+	currentScene->registry.emplace<Skybox>(skyboxEntity);
+	currentScene->registry.emplace<Transforms>(skyboxEntity, XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(100.0f, 100.0f, 100.0f));
+
+	auto fox = currentScene->registry.create();
+	currentScene->registry.emplace<Renderable>(fox);
+	currentScene->registry.emplace<Model>(fox, std::string("resources\\mesh\\fox.glb"));
+	currentScene->registry.emplace<Transforms>(fox, XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(2.0f, 2.0f, 2.0f));
+	currentScene->registry.emplace<AudioSource>(fox, "resources\\sounds\\gura.wav");
+
+	componentSystems = std::make_unique<SceneNS::Systems>(*this, *currentScene.get());
+	componentSystems->InitSystems();
+
+	componentSystems->modelSystem->Load(currentScene->registry);
+	componentSystems->audioSystem->sourceSystem->LoadSoundFromFS();
+	componentSystems->audioSystem->sourceSystem->PlayLoopedSound();
+}
+
 void DxEngine::Renderer::CreateConstantBuffers()
 {
 	D3D11_BUFFER_DESC bd = {};
@@ -199,71 +275,6 @@ void DxEngine::Renderer::InitRenderStates()
 {
 }
 
-DxEngine::Renderer::Renderer(Window &window) : windowRef(window)
-{
-	using namespace SceneNS::Components;
-	CreateSwapChain();
-	CreateRenderTarget();
-	CreateViewport();
-	renderStates = std::make_unique<RenderStates>();
-	CreateDepthBuffer();
-	CreateConstantBuffers();
-	CreateSamplerState();
-	CreateRasterizerState();
-	CreateImGUIContext();
-
-	shaderLibrary = std::make_unique<ShaderLibrary>(device.Get());
-	shaderLibrary->LoadFromFile();
-	shaderLibrary->CreateInputLayout();
-
-	deviceContext->VSSetConstantBuffers(0, 1, renderStates->cbPerRender.GetAddressOf());
-	deviceContext->VSSetConstantBuffers(1, 1, renderStates->cbPerObject.GetAddressOf());
-	deviceContext->VSSetConstantBuffers(2, 1, renderStates->constantBufferBones.GetAddressOf());
-	deviceContext->VSSetConstantBuffers(3, 1, renderStates->cbPerFrame.GetAddressOf());
-
-	XMVECTOR Eye = XMVectorSet(0.0f, 2.0f, -5.0f, 0.0f);
-	XMVECTOR At = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-	XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-	cbPerFrame.view = XMMatrixLookAtLH(Eye, At, Up);
-	cbPerRender.projection = XMMatrixPerspectiveFovLH(XM_PIDIV2, 1920 / (FLOAT)1080, 0.01f, 100.0f);
-
-	//SetCursorPos(windowRef.width / 2 + 1, windowRef.height / 2);
-
-	ConstantBufferPerRender rcb = cbPerRender;
-	rcb.projection = XMMatrixTranspose(rcb.projection);
-	ConstantBufferPerFrame cb = cbPerFrame;
-	cb.view = XMMatrixTranspose(cb.view);
-	deviceContext->UpdateSubresource(renderStates->cbPerRender.Get(), 0, nullptr, &rcb, 0, 0);
-	deviceContext->UpdateSubresource(renderStates->cbPerFrame.Get(), 0, nullptr, &cb, 0, 0);
-
-	CreateScene();
-
-	auto camera = currentScene->registry.create();
-	currentScene->registry.emplace<Camera>(camera);
-	currentScene->registry.emplace<AudioListener>(camera);
-	currentScene->registry.emplace<Transforms>(camera, XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f));
-
-	auto entity = currentScene->registry.create();
-	currentScene->registry.emplace<Renderable>(entity);
-	currentScene->registry.emplace<Model>(entity, "resources\\mesh\\soldier.glb");
-	//currentScene->registry.emplace<AudioSource>(entity, "resources\\sounds\\takeme.wav");
-	currentScene->registry.emplace<Transforms>(entity, XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f));
-	//BoxCollider collider;
-	//collider.colliderBox.Center = { 0.0f,  0.0f, 0.0f };
-	//collider.colliderBox.Extents = { 2.0f,  2.0f,  2.0f };
-	//currentScene->registry.emplace<BoxCollider>(entity, collider);
-
-	auto skyboxEntity = currentScene->registry.create();
-	currentScene->registry.emplace<Renderable>(skyboxEntity);
-	currentScene->registry.emplace<Model>(skyboxEntity, std::string("resources\\mesh\\skybox.glb"));
-	currentScene->registry.emplace<Skybox>(skyboxEntity);
-
-	componentSystems = std::make_unique<SceneNS::Systems>(*this, *currentScene.get());
-	componentSystems->InitSystems();
-	componentSystems->modelSystem->Load(currentScene->registry);
-	componentSystems->audioSystem->sourceSystem->LoadSoundFromFS();
-	componentSystems->audioSystem->sourceSystem->PlaySoundOnce();
-}
 
 void DxEngine::Renderer::RenderFrame()
 {

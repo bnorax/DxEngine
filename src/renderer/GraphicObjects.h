@@ -53,6 +53,10 @@ namespace DxEngine {
 		XMMATRIX finalTransform;
 	};
 	struct Animation {
-		std::string a;
+		std::string name;
+		double duration;
+		double tickPerSecond;
+		int numChannels;
+		//std::vector<>
 	};
 }
