@@ -69,7 +69,13 @@ DxEngine::Renderer::Renderer(Window &window) : windowRef(window)
 	currentScene->registry.emplace<Renderable>(fox);
 	currentScene->registry.emplace<Model>(fox, std::string("resources\\mesh\\fox.glb"));
 	currentScene->registry.emplace<Transforms>(fox, XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(2.0f, 2.0f, 2.0f));
-	currentScene->registry.emplace<AudioSource>(fox, "resources\\sounds\\gura.wav");
+
+	auto miku = currentScene->registry.create();
+	currentScene->registry.emplace<Renderable>(miku);
+	currentScene->registry.emplace<Model>(miku, std::string("resources\\mesh\\miku.glb"));
+	currentScene->registry.emplace<Transforms>(miku, XMFLOAT3(2.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(4.0f, 4.0f, 4.0f));
+
+	//currentScene->registry.emplace<AudioSource>(fox, "resources\\sounds\\gura.wav");
 
 	componentSystems = std::make_unique<SceneNS::Systems>(*this, *currentScene.get());
 	componentSystems->InitSystems();
