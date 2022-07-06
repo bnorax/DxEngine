@@ -3,8 +3,10 @@
 #include "renderer/Renderer.h"
 //#include "scene/components/Renderable.h"
 
-#include "assimp/Importer.hpp"
-#include "assimp/postprocess.h"
+//#include "assimp/Importer.hpp"
+//#include "assimp/postprocess.h"
+
+#include "tinygltf/tiny_gltf.h"
 
 #include "WICTextureLoader.h"
 
@@ -12,6 +14,7 @@
 #include <scene/components/Skybox.h>
 #include <scene/components/Renderable.h>
 #include <scene/components/Transforms.h>
+#include "renderer/glTFReader.h"
 
 #include <core/Time.h>
 
@@ -373,49 +376,38 @@ std::shared_ptr<DxEngine::Mesh> DxEngine::SceneNS::ModelSystem::processMesh(Comp
 	return curMesh;
 }
 
-void DxEngine::SceneNS::ModelSystem::processNode(aiNode* node, const aiScene* scene, Components::Model& data) {
-
-	for (unsigned int i = 0; i < node->mNumMeshes; i++) {
-		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-		data.meshes.push_back(this->processMesh(data, mesh, scene));
-	}
-
-	for (unsigned int i = 0; i < node->mNumChildren; i++) {
-		this->processNode(node->mChildren[i], scene, data);
-	}
-}
+//void DxEngine::SceneNS::ModelSystem::processNode(tinygltf::Node& node, Components::Model& data) 
+//{
+//
+//	for (unsigned int i = 0; i < node->mNumMeshes; i++) {
+//		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+//		data.meshes.push_back(this->processMesh(data, mesh, scene));
+//	}
+//
+//	for (unsigned int i = 0; i < node->mNumChildren; i++) {
+//		this->processNode(node->mChildren[i], scene, data);
+//	}
+//}
 
 bool DxEngine::SceneNS::ModelSystem::Load(entt::registry& registry)
 {
-	Assimp::Importer importer;
-
 	auto view = registry.view<Components::Model>();
 	for (auto entity : view) {
 		auto component = view.get<Components::Model>(entity);
-		importer.ReadFile(component.filePath,
-			aiProcess_CalcTangentSpace | // calculate tangents and bitangents if possible
-			aiProcess_JoinIdenticalVertices | // join identical vertices/ optimize indexing
-			aiProcess_Triangulate | // Ensure all verticies are triangulated (each 3 vertices are triangle)
-			aiProcess_ImproveCacheLocality | // improve the cache locality of the output vertices
-			aiProcess_RemoveRedundantMaterials | // remove redundant materials
-			aiProcess_FindDegenerates | // remove degenerated polygons from the import
-			aiProcess_FindInvalidData | // detect invalid model data, such as invalid normal vectors
-			aiProcess_GenUVCoords | // convert spherical, cylindrical, box and planar mapping to proper UVs
-			aiProcess_TransformUVCoords | // preprocess UV transformations (scaling, translation ...)
-			aiProcess_FindInstances | // search for instanced meshes and remove them by references to one master
-			aiProcess_LimitBoneWeights |
-			aiProcess_ConvertToLeftHanded);
-		const aiScene* loadedScene = importer.GetScene();
-		if (loadedScene == nullptr) {
-			return false;
-		}
-		component.modelInverseTransform = aiToXMMATRIX(loadedScene->mRootNode->mTransformation);
 
-		processNode(loadedScene->mRootNode, loadedScene, component);
+		ModelLoader loader;
+
+		loader.LoadFile(component.filePath);
+
 		registry.replace<Components::Model>(entity, component);
 	}
 	return true;
 }
+
+
+
+
+
 
 void DxEngine::SceneNS::ModelSystem::Draw(entt::registry& registry) {
 	Time& time = Time::Instance();

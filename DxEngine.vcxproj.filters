@@ -170,6 +170,9 @@
     <ClInclude Include="src\scene\systems\audio\AudioSystem.h">
       <Filter>src\scene\systems\audio</Filter>
     </ClInclude>
+    <ClInclude Include="src\renderer\glTFReader.h">
+      <Filter>src\renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="include\imgui\imgui.cpp">
@@ -237,6 +240,9 @@
     </ClCompile>
     <ClCompile Include="src\scene\systems\audio\AudioSourceSystem.cpp">
       <Filter>src\scene\systems\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="src\renderer\glTFReader.cpp">
+      <Filter>src\renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

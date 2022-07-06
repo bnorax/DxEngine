@@ -1,5 +1,6 @@
 #include "Renderer.h"
 #include <DirectXColors.h>
+#include "renderer/glTFReader.h"
 
 namespace sfs = std::filesystem;
 
@@ -42,6 +43,9 @@ DxEngine::Renderer::Renderer(Window &window) : windowRef(window)
 	deviceContext->UpdateSubresource(renderStates->cbPerFrame.Get(), 0, nullptr, &cb, 0, 0);
 
 	CreateScene();
+
+	//DxEngine::LoadFile("resources\\mesh\\box\\Box.gltf");
+
 
 	auto camera = currentScene->registry.create();
 	currentScene->registry.emplace<Camera>(camera);
