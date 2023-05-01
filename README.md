@@ -3,8 +3,8 @@
 Personal project for learning DirectX 11 and C++ 17.
 
 <img src="https://github.com/bnorax/DxEngine/blob/ecsmain/resources/screens/DxEngine.png" width="720">
-<img src="https://github.com/bnorax/DxEngine/blob/ecsmain/resources/screens/RCo2xIZ6Zow.jpg" width="720">
-<img src="https://github.com/bnorax/DxEngine/blob/ecsmain/resources/screens/o8kYkFsQx9U.jpg" width="720">
+<img src="https://github.com/bnorax/DxEngine/blob/ecsmain/resources/screens/RCo2xIZ6Zow.jpg" width="360">
+<img src="https://github.com/bnorax/DxEngine/blob/ecsmain/resources/screens/o8kYkFsQx9U.jpg" width="360">
 
 
 ## Current status/features
