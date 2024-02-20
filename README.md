@@ -11,7 +11,7 @@ Personal project for learning DirectX 11 and C++ 17.
 ## Current status/features
 * Loading meshes/simple materials(diffuse map only)/animations.
 * Simple audio listener/emitter system.
-* Skeletal animation(not working in current iteraion/need rework as ECS system). When it worked, it looked like this (example): https://youtu.be/iSZX21vZ240
+* Skeletal animation(broken in current iteraion/need rework as ECS system).
 * Free floating camera
 ## Structure
 Latest iteration of engine uses ECS pattern for game objects in scene.
